@@ -1,6 +1,8 @@
 package com.example.robert.parksmart;
 
 
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,6 +24,7 @@ public class Activity_Park extends Fragment {
         View view  =  inflater.inflate(R.layout.activity_park, container ,false);
 
         parkMyCar = (Button) view.findViewById(R.id.bParkMyCar);
+
 
         parkMyCar.setOnClickListener(new View.OnClickListener() {
             @Override

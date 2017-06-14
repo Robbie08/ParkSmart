@@ -1,12 +1,15 @@
 package com.example.robert.parksmart;
 
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -19,7 +22,7 @@ public class Activity_Map extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private SupportMapFragment mSupportMapFragment;
-    float zoomLevel = (float) 12.0; //This goes up to 21
+    float zoomLevel = (float) 12.0; //The zoom of the map
 
     @Nullable
     @Override
@@ -35,6 +38,7 @@ public class Activity_Map extends Fragment implements OnMapReadyCallback {
             fm.beginTransaction().hide(mSupportMapFragment).commit();
         else
             fm.beginTransaction().show(mSupportMapFragment).commit();
+
 
 
         return view;
@@ -55,7 +59,7 @@ public class Activity_Map extends Fragment implements OnMapReadyCallback {
 
         // Add a marker in San Diego and move the camera
         LatLng sanDiego = new LatLng(32.7157,-117.1611); //arguments Lat and Long
-        mMap.addMarker(new MarkerOptions().position(sanDiego).title("San Diego")); //pass in the LatLng object
+        mMap.addMarker(new MarkerOptions().position(sanDiego).title("Park Smart Headquarters")); //pass in the LatLng object
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sanDiego,zoomLevel)); //move the camera to where the object is pointing
     }

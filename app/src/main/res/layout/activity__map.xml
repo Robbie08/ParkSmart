@@ -1,13 +1,38 @@
-<FrameLayout android:layout_height="match_parent"
+<FrameLayout xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
+
     xmlns:android="http://schemas.android.com/apk/res/android" >
 
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.robert.parksmart.Activity_Map" />
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.example.robert.parksmart.Activity_Map" >
+
+
+
+    </fragment>
+
+    <EditText
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:id="@+id/etSearchLocation"
+        android:layout_width="match_parent"
+        android:layout_height="57dp"
+        android:background="@color/colorWhite"
+        android:ems="10"
+        android:hint="Search School"
+        android:inputType="textPostalAddress"
+        android:drawableEnd="@android:drawable/ic_menu_search"
+        android:textSize="16sp" />
+
 </FrameLayout>
