@@ -45,6 +45,11 @@ public class Activity_Start extends AppCompatActivity {
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, activity_map).commit();
                         break;
+                    case R.id.park_id:
+                        Activity_Park activity_park = new Activity_Park(); //create an instance of our Activity_Park Class
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fragment_container,activity_park).commit(); //pass in our fragment
                     default:
                         break;
 

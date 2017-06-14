@@ -8,6 +8,10 @@
             android:icon="@drawable/ic_home_white_24dp"
                 ></item>
         <item
+            android:id="@+id/park_id"
+            android:title="Smart Parking"
+            android:icon="@drawable/ic_pin_drop_white_24dp"></item>
+        <item
             android:id="@+id/feedback_id"
             android:title="Feed Back"
             android:icon="@drawable/ic_feedback_white_24dp"
