@@ -13,46 +13,50 @@
         android:layout_height="match_parent"
         tools:context="com.example.robert.parksmart.Fragment_Map" >
 
-
-
     </fragment>
 
     <RelativeLayout
-        android:layout_width="340dp"
+        android:layout_width="match_parent"
         android:layout_height="70dp"
+        android:layout_gravity="center|bottom"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:fitsSystemWindows="true"
+        android:gravity="center|bottom"
         android:orientation="horizontal"
-        android:paddingBottom="16dp">
+        android:paddingBottom="16dp"
+        android:visibility="visible">
 
         <EditText
             android:id="@+id/etSearchLocation"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/colorWhite"
-            android:ems="10"
-            android:hint="Search School"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="16dp"
+            android:ems="1"
+            android:gravity="start"
+            android:hint="@string/search_school"
             android:paddingBottom="16dp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:singleLine="true"
             android:textSize="16sp" />
 
         <ImageButton
             android:id="@+id/bSearchLocation"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/colorWhite"
-            android:src="@android:drawable/ic_menu_search"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:clickable="true"
-            android:onClick="findLocation"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true" />
+            android:background="@color/colorWhite"
+            android:clickable="true"
+            android:hapticFeedbackEnabled="true"
+            android:paddingBottom="16dp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:src="@android:drawable/ic_menu_search" />
 
 
     </RelativeLayout>

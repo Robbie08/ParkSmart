@@ -1,7 +1,10 @@
 package com.example.robert.parksmart;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -22,7 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.OnClickListener,GoogleMap.OnInfoWindowClickListener {
+public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.OnClickListener, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
     private SupportMapFragment mSupportMapFragment;
@@ -31,19 +34,20 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     ImageButton bSearchLocation;
     EditText etSearchLocation;
     String parsedLocation;
+    static final LatLng UCSD = new LatLng(32.879657, -117.237566);
     static final LatLng UCSDGILMAN = new LatLng(32.877592, -117.233713);
     static final LatLng UCSDPARKINGLOT208 = new LatLng(32.880419, -117.242952);
     static final LatLng UCSDPARKINGLOT207 = new LatLng(32.880417, -117.241365);
     static final LatLng UCSDPARKINGLOTP103 = new LatLng(32.873129, -117.242259);
 
     float zoomLevel = (float) 12.0; //The zoom of the map
-    float parkingZoomLevel = (float) 18.0; //The zoom of the map
+    float parkingZoomLevel = (float) 15.0; //The zoom of the map
     float blue = BitmapDescriptorFactory.HUE_AZURE;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view  =  inflater.inflate(R.layout.fragment_map, container ,false);
+        view = inflater.inflate(R.layout.fragment_map, container, false);
         bSearchLocation = (ImageButton) view.findViewById(R.id.bSearchLocation); //initialize searchLocation button
         etSearchLocation = (EditText) view.findViewById(R.id.etSearchLocation); //initialize searchLocation EditText
 
@@ -60,7 +64,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
             fm.beginTransaction().hide(mSupportMapFragment).commit();
         else
             fm.beginTransaction().show(mSupportMapFragment).commit();
-
 
 
         return view;
@@ -80,12 +83,21 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         mMap = googleMap; //create an instance of our googleMap class
 
         // Add a marker in San Diego and move the camera
-        LatLng sanDiego = new LatLng(32.7157,-117.1611); //arguments Lat and Long
+        LatLng sanDiego = new LatLng(32.7157, -117.1611); //arguments Lat and Long
 
         mMap.addMarker(new MarkerOptions().position(sanDiego).title("Park Smart Headquarters")); //pass in the LatLng object
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sanDiego,zoomLevel)); //move the camera to where the object is pointing
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sanDiego, zoomLevel)); //move the camera to where the object is pointing
+
+        if ( (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+
+            mMap.setMyLocationEnabled(true);
+        }
 
 
+        Marker ucsd = mMap.addMarker(new MarkerOptions()
+                .position(UCSD)
+                .title("University California, San Diego"));
         Marker ucsdGilman = mMap.addMarker(new MarkerOptions()
                 .position(UCSDGILMAN)
                 .title("Gilman Parking Structure")
@@ -138,6 +150,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
 
     @Override
     public void onClick(View view) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(UCSD,parkingZoomLevel)); //move the camera to where the object is pointing
         if(etSearchLocation != null) {
             parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
         }else{
@@ -146,6 +159,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         }
         onDataChanged.dataSend(parsedLocation); //pass data through the interface
         Log.d("TEST", "Location: " +parsedLocation);
+        etSearchLocation.setText("");
 
     }
 
