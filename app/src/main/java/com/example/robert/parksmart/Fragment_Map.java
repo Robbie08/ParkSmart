@@ -3,6 +3,8 @@ package com.example.robert.parksmart;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -25,6 +27,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.util.List;
+
 public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.OnClickListener, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
@@ -41,7 +46,8 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     static final LatLng UCSDPARKINGLOTP103 = new LatLng(32.873129, -117.242259);
 
     float zoomLevel = (float) 12.0; //The zoom of the map
-    float parkingZoomLevel = (float) 15.0; //The zoom of the map
+    float parkingZoomLevel = (float) 18.0; //The zoom of the map
+    float schoolZoomLevel = (float) 15.0;
     float blue = BitmapDescriptorFactory.HUE_AZURE;
 
     @Nullable
@@ -95,9 +101,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         }
 
 
-        Marker ucsd = mMap.addMarker(new MarkerOptions()
-                .position(UCSD)
-                .title("University California, San Diego"));
         Marker ucsdGilman = mMap.addMarker(new MarkerOptions()
                 .position(UCSDGILMAN)
                 .title("Gilman Parking Structure")
@@ -127,15 +130,83 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
 
     }
 
+    /**
+     * When the user clicks the search button
+     *
+     * @param view pass in the fragment
+     */
+    @Override
+    public void onClick(View view) {
+
+        if(etSearchLocation != null) {
+            parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
+        }
+        onDataChanged.dataSend(parsedLocation); //pass data through the interface
+        Log.d("TEST", "Location: " +parsedLocation);
+        etSearchLocation.setText("");
+        goToPlace(parsedLocation,schoolZoomLevel);
+
+    }
+
+    /**
+     * Method will contain the ability to find any location from the Geocoder services form the
+     * Android Dev kit. Will convert the location entered into a location by the Geocoder and then
+     * stored into a List. We will have to catch some exceptions in case 1) There is no connection
+     * to the Geocoder or if the user input a location that does not exist.
+     *
+     * @param locationName will be the location entered into the EditText
+     * @param zoomLev will be the desired zoomLevel of the camera
+     */
+    private void goToPlace(String locationName, float zoomLev){
+        // ToDo: find this place using the GeoCoder and go there
+        Geocoder geoCoder = new Geocoder(getContext()); // create an instance of Geocoder class
+        if(Geocoder.isPresent()){
+
+            try {
+                List<Address> addresses = geoCoder.getFromLocationName(locationName,1);
+                if(addresses.size() == 0){
+                    //if there is no address found
+                    Toast.makeText(getContext(),"No Address Found, Please Try Again",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Address address = addresses.get(0); //Address at top of list
+                LatLng location = new LatLng(address.getLatitude(),address.getLongitude()); //store the lat and long from place
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,zoomLev)); //send our user to the location
+
+            } catch (IOException e) {
+                //if can't establish connection to Geo Coder
+                Toast.makeText(getContext(),"Network Connection Not Found",Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+            catch (IllegalArgumentException e){
+                //if null
+                Toast.makeText(getContext(),"Please Input A Place",Toast.LENGTH_LONG).show();
+            }
+        }
+
+
+
+    }
+
+    /**
+     * Will be executed once the user clicks on the infoWindow.
+     *
+     * @param marker the Marker from the loaction
+     */
     @Override
     public void onInfoWindowClick(Marker marker) {
-
+        //if the infoWindow is clicked
 
         marker.showInfoWindow();
         Toast.makeText(getContext(), "Info window clicked",
                 Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Will create an instance of the onDataChanged interface
+     *
+     * @param context the fragment or activity
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -148,21 +219,11 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         }
     }
 
-    @Override
-    public void onClick(View view) {
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(UCSD,parkingZoomLevel)); //move the camera to where the object is pointing
-        if(etSearchLocation != null) {
-            parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
-        }else{
-            //if the etSearchLocation is null
-            parsedLocation = "FAIL";
-        }
-        onDataChanged.dataSend(parsedLocation); //pass data through the interface
-        Log.d("TEST", "Location: " +parsedLocation);
-        etSearchLocation.setText("");
 
-    }
-
+    /**
+     * Interface will establish Communication between
+     * this fragment and the Containing Activity
+     */
     public interface onDataChanged {
         void dataSend(String locationName);
     }
