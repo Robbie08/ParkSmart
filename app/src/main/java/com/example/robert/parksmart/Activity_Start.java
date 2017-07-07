@@ -20,6 +20,7 @@ public class Activity_Start extends AppCompatActivity implements Fragment_Map.on
     NavigationView navigationView;
     Fragment_Map fragment_map; // Initialize an instance of our Fragment Class
     ActionBarDrawerToggle actionBarDrawerToggle;
+    Fragment_RecentLocations fmRecentLocations;
     Fragment_Park fragment_park; //create an instance of our Fragment_Park Class
     String recievedValue;
 
@@ -65,6 +66,13 @@ public class Activity_Start extends AppCompatActivity implements Fragment_Map.on
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, fragment_park).commit(); //pass in our fragment
+                        break;
+                    case R.id.recent_id:
+                        fmRecentLocations = new Fragment_RecentLocations(); //create an instance of our Fragment_RecentLocations class
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fragment_container,fmRecentLocations).commit();
+                        break;
                     default:
                         break;
 
