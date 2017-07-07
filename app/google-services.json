@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "14351864908",
+    "firebase_url": "https://parksmart-f23cb.firebaseio.com",
+    "project_id": "parksmart-f23cb",
+    "storage_bucket": "parksmart-f23cb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:14351864908:android:07422a30e30636e8",
+        "android_client_info": {
+          "package_name": "com.example.robert.parksmart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "14351864908-t88eh85rrq77of57crebh6o6fensg3lr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0T2MUnL_fwBJfBk3QNCjmFWz9GwFBfg4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

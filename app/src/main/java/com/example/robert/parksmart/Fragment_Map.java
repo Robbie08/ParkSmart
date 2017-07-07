@@ -149,12 +149,12 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     }
 
     /**
-     * Method will contain the ability to find any location from the Geocoder services form the
-     * Android Dev kit. Will convert the location entered into a location by the Geocoder and then
+     * Method will contain the ability to find any mLocation from the Geocoder services form the
+     * Android Dev kit. Will convert the mLocation entered into a mLocation by the Geocoder and then
      * stored into a List. We will have to catch some exceptions in case 1) There is no connection
-     * to the Geocoder or if the user input a location that does not exist.
+     * to the Geocoder or if the user input a mLocation that does not exist.
      *
-     * @param locationName will be the location entered into the EditText
+     * @param locationName will be the mLocation entered into the EditText
      * @param zoomLev will be the desired zoomLevel of the camera
      */
     private void goToPlace(String locationName, float zoomLev){
@@ -171,7 +171,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
                 }
                 Address address = addresses.get(0); //Address at top of list
                 LatLng location = new LatLng(address.getLatitude(),address.getLongitude()); //store the lat and long from place
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,zoomLev)); //send our user to the location
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,zoomLev)); //send our user to the mLocation
 
             } catch (IOException e) {
                 //if can't establish connection to Geo Coder

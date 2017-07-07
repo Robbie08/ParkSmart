@@ -2,9 +2,18 @@ package com.example.robert.parksmart;
 
 
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +22,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
-public class Activity_Start extends AppCompatActivity implements Fragment_Map.onDataChanged {
+import com.firebase.client.Firebase;
+
+public class MainActivity extends AppCompatActivity implements Fragment_Map.onDataChanged {
 
     Toolbar toolBar;
     DrawerLayout drawerLayout;
@@ -22,7 +33,13 @@ public class Activity_Start extends AppCompatActivity implements Fragment_Map.on
     ActionBarDrawerToggle actionBarDrawerToggle;
     Fragment_RecentLocations fmRecentLocations;
     Fragment_Park fragment_park; //create an instance of our Fragment_Park Class
-    String recievedValue;
+    String recievedValue, passedLocation;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    Location mLocation;
+    Bundle bundle;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +47,54 @@ public class Activity_Start extends AppCompatActivity implements Fragment_Map.on
         setContentView(R.layout.activity_start);
         toolBar = (Toolbar) findViewById(R.id.toolBar); //initialize toolbar
         setSupportActionBar(toolBar); //add toolbar to application
+
+
+
+
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Log.i("Location",location.toString()); //log current location
+                Log.i("My current Location", mLocation.toString()); // get current location
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
+
+        /*Check if device is running SDK < 23*/
+        if(Build.VERSION.SDK_INT < 23){
+            // Permission is not needed on versions lower than SDK 23
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener); // update the users current mLocation
+            mLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER); //get the users mLocation one time
+
+        }else{
+              /*Check if the user has given permission*/
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                //if we dont have permission we will have to ask for it
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1); //ask the user for permission
+            }else
+            {
+                //if permission has been granted previously
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
+                mLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER); //get the users mLocation one time
+
+            }
+        }
 
 
         /*Start The App in the Map Fragment*/
@@ -88,11 +153,34 @@ public class Activity_Start extends AppCompatActivity implements Fragment_Map.on
 
     }
 
+    /**
+     * Method  will ask for permission to use the Phones Current GPS mLocation
+     * if they have not done granted permssion before
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+             /*Check if the user has given permission*/
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                //if we do have permission we will get the users mLocation
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
+                mLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER); //get the users mLocation one time
+
+            }
+
+        }
+    }
+
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         actionBarDrawerToggle.syncState();
-
     }
 
 
