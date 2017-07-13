@@ -3,7 +3,9 @@ package com.example.robert.parksmart;
 
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -21,8 +23,11 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.firebase.client.Firebase;
+import com.firebase.client.realtime.Connection;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements Fragment_Map.onDataChanged {
 
@@ -38,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
     LocationListener locationListener;
     Location mLocation;
     Bundle bundle;
+    private FirebaseAuth firebaseAuth;
+    private ProgressDialog progressDialog;
 
 
 
@@ -49,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         setSupportActionBar(toolBar); //add toolbar to application
 
 
+
+        progressDialog = new ProgressDialog(this);
+        firebaseAuth = FirebaseAuth.getInstance();
 
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -75,6 +85,12 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
 
             }
         };
+
+        //Check if the user is not logged in
+        if(firebaseAuth.getCurrentUser() == null){
+            finish();
+            startActivity(new Intent(this,User_LogIn.class));
+        }
 
         /*Check if device is running SDK < 23*/
         if(Build.VERSION.SDK_INT < 23){
@@ -138,6 +154,12 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
                                 .beginTransaction()
                                 .replace(R.id.fragment_container,fmRecentLocations).commit();
                         break;
+                    case R.id.signout_id:
+                        progressDialog.setMessage("Signing Out...");
+                        progressDialog.show();
+                        logUserOut();
+                        break;
+
                     default:
                         break;
 
@@ -153,6 +175,32 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
 
     }
 
+    private void logUserOut(){
+
+        try {
+            firebaseAuth.signOut();
+            if(firebaseAuth.getCurrentUser() == null){
+                finish();
+                Intent i = new Intent(MainActivity.this,User_LogIn.class);
+                startActivity(i);
+                progressDialog.dismiss();
+                Toast.makeText(getApplicationContext(),"Singed out Successfully",
+                        Toast.LENGTH_LONG).show();
+            }else {
+                Toast.makeText(getApplicationContext(),"Could not sign out, please try again",
+                        Toast.LENGTH_LONG).show();
+                progressDialog.dismiss();
+                return;
+            }
+        }catch (Exception e){
+            Toast.makeText(getApplicationContext(),"Could not sign out, please try again",
+                    Toast.LENGTH_LONG).show();
+            progressDialog.dismiss();
+            return;
+
+        }
+
+    }
     /**
      * Method  will ask for permission to use the Phones Current GPS mLocation
      * if they have not done granted permssion before

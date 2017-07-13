@@ -47,8 +47,8 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
 
     float zoomLevel = (float) 12.0; //The zoom of the map
     float parkingZoomLevel = (float) 18.0; //The zoom of the map
-    float schoolZoomLevel = (float) 15.0;
-    float blue = BitmapDescriptorFactory.HUE_AZURE;
+    float schoolZoomLevel = (float) 14.5;
+    float green = BitmapDescriptorFactory.HUE_GREEN;
 
     @Nullable
     @Override
@@ -91,6 +91,8 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         // Add a marker in San Diego and move the camera
         LatLng sanDiego = new LatLng(32.7157, -117.1611); //arguments Lat and Long
 
+
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL); //sets the maps view
         mMap.addMarker(new MarkerOptions().position(sanDiego).title("Park Smart Headquarters")); //pass in the LatLng object
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sanDiego, zoomLevel)); //move the camera to where the object is pointing
 
@@ -98,29 +100,32 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
 
             mMap.setMyLocationEnabled(true);
+        }else {
+            Toast.makeText(getContext(),"Please Enable Location On Your Device To Use Google Maps",
+                    Toast.LENGTH_LONG).show();
         }
 
 
         Marker ucsdGilman = mMap.addMarker(new MarkerOptions()
                 .position(UCSDGILMAN)
                 .title("Gilman Parking Structure")
-                .snippet("Currently 63% Full").icon(BitmapDescriptorFactory.defaultMarker(blue))
+                .snippet("Currently 63% Full").icon(BitmapDescriptorFactory.defaultMarker(green))
         );
 
         Marker ucsdParkingLot208 = mMap.addMarker(new MarkerOptions()
                 .position(UCSDPARKINGLOT208)
                 .title("UCSD Parking Lot 208")
-                .snippet("Currently 51% Full").icon(BitmapDescriptorFactory.defaultMarker(blue))
+                .snippet("Currently 51% Full").icon(BitmapDescriptorFactory.defaultMarker(green))
         );
         Marker ucsdParkingLot207 = mMap.addMarker(new MarkerOptions()
                 .position(UCSDPARKINGLOT207)
                 .title("UCSD Parking Lot 207")
-                .snippet("Currently 39% Full").icon(BitmapDescriptorFactory.defaultMarker(blue))
+                .snippet("Currently 39% Full").icon(BitmapDescriptorFactory.defaultMarker(green))
         );
         Marker ucsdParkingLotP303 = mMap.addMarker(new MarkerOptions()
                 .position(UCSDPARKINGLOTP103)
                 .title("UCSD Parking Lot P103")
-                .snippet("Currently 76% Full").icon(BitmapDescriptorFactory.defaultMarker(blue))
+                .snippet("Currently 76% Full").icon(BitmapDescriptorFactory.defaultMarker(green))
         );
 
 
@@ -142,7 +147,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
             parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
         }
         onDataChanged.dataSend(parsedLocation); //pass data through the interface
-        Log.d("TEST", "Location: " +parsedLocation);
+        Log.d("TEST", "MyLocation: " +parsedLocation);
         etSearchLocation.setText("");
         goToPlace(parsedLocation,schoolZoomLevel);
 

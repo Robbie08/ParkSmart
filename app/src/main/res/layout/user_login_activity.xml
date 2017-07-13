@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+    <TextView
+        android:text="@string/tvSendRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvSendRegister"
+        android:layout_marginBottom="16dp"
+        android:onClick="sendRegister"
+        android:layout_above="@+id/bLogIn"
+        android:layout_alignEnd="@+id/bLogIn"
+        android:clickable="true" />
+
+
+    <TextView
+        android:text="@string/forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvForgotPassword"
+        android:onClick="forgotPassword"
+        android:clickable="true"
+        android:layout_alignBaseline="@+id/tvSendRegister"
+        android:layout_alignBottom="@+id/tvSendRegister"
+        android:layout_alignStart="@+id/bLogIn" />
+
+    <TextView
+        android:text="@string/user_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:layout_marginBottom="27dp"
+        android:id="@+id/tvHeader"
+        android:layout_above="@+id/layout_linearLayout"
+        android:layout_centerHorizontal="true" />
+
+    <LinearLayout
+        android:id="@+id/layout_linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:orientation="vertical"
+        android:layout_above="@+id/tvSendRegister"
+        android:layout_centerHorizontal="true">
+
+        <EditText
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/email"
+            android:id="@+id/etEmailLogIn"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:background="@drawable/input_outline"
+            android:inputType="textEmailAddress"
+            android:padding="10dp" />
+
+        <EditText
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/password"
+            android:id="@+id/etPasswordLogIn"
+            android:background="@drawable/input_outline"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:inputType="textPassword"
+
+            android:padding="10dp" />
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/signIn"
+        android:id="@+id/bLogIn"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:onClick="logIn"
+        android:layout_marginBottom="101dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>

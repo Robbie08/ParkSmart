@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-
     xmlns:android="http://schemas.android.com/apk/res/android" >
 
 
@@ -32,7 +31,6 @@
             android:id="@+id/etSearchLocation"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorWhite"
             android:ems="1"
             android:gravity="start"
             android:hint="@string/search_school"
@@ -40,6 +38,7 @@
             android:paddingEnd="16dp"
             android:paddingStart="16dp"
             android:paddingTop="16dp"
+            android:background="@color/colorWhite"
             android:singleLine="true"
             android:textSize="16sp" />
 

@@ -20,6 +20,10 @@
             android:title="Settings"
             android:icon="@drawable/ic_settings_white_24dp"
             ></item>
+        <item
+            android:id="@+id/signout_id"
+            android:title="Sign Out"
+            android:icon="@drawable/ic_exit_to_app_white_24dp"></item>
     </group>
 
     <item android:title="Social">
