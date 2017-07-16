@@ -37,9 +37,10 @@ public class Fragment_Park extends Fragment {
     private Button parkMyCar;
     LocationManager locationManager;
     Criteria criteria;
-    double latitude ,longitude;
+    double latitude ,longitude ;
     private Firebase mRef;
     private ProgressDialog progressDialog;
+    public String provider;
 
     @Nullable
     @Override
@@ -58,24 +59,34 @@ public class Fragment_Park extends Fragment {
 
         /*Location Manager Set Up*/
         criteria = new Criteria(); //create an instance of the criteria class
+        criteria.setAltitudeRequired(true);
+        criteria.setBearingRequired(true);
+        criteria.setCostAllowed(true);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE); //add location manager
-        String provider = locationManager.getBestProvider(criteria, true); //set our provider
+        provider = locationManager.getBestProvider(criteria, true); //set our provider
 
-        /*Check if the user has given permission */
-        if ((ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
 
-            //if we have permission
-            Location location = locationManager.getLastKnownLocation(provider);//create a location and take in the provider
-            latitude = location.getLatitude(); //get an set our latitude
-            longitude = location.getLongitude(); //get an set our longitude
-        }
 
         /*On Click Listener to save Location*/
         parkMyCar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //once the parkMyCar Button is clicked
+
+                   /*Check if the user has given permission */
+                if ((ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                        ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+
+                    //if we have permission
+                    try {
+                        Location location = locationManager.getLastKnownLocation(provider);//create a location and take in the provider
+                        latitude = location.getLatitude(); //get an set our latitude
+                        longitude = location.getLongitude(); //get an set our longitude
+                    }catch (NullPointerException e){
+                        Toast.makeText(getContext(),"NullPointerException Caught... You're Welcome",Toast.LENGTH_LONG).show();
+                    }
+                }
 
                 progressDialog.show(); // show our progress dialog
                 new BackGroundTask().execute(); //execute our background tasks
