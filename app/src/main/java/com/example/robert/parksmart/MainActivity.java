@@ -25,8 +25,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.firebase.client.Firebase;
-import com.firebase.client.realtime.Connection;
+import com.example.robert.parksmart.Activities.User_LogIn;
+import com.example.robert.parksmart.Fragments.Fragment_Map;
+import com.example.robert.parksmart.Fragments.Fragment_Park;
+import com.example.robert.parksmart.Fragments.Fragment_RecentLocations;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements Fragment_Map.onDataChanged {

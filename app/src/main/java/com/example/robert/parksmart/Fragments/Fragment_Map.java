@@ -1,4 +1,4 @@
-package com.example.robert.parksmart;
+package com.example.robert.parksmart.Fragments;
 
 import android.Manifest;
 import android.content.Context;
@@ -18,6 +18,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.example.robert.parksmart.R;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -35,10 +37,11 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     private GoogleMap mMap;
     private SupportMapFragment mSupportMapFragment;
     onDataChanged onDataChanged; //create an instance of the Interface
-    View view;
+    View view; // view object that will be returned in the onCreateView
     ImageButton bSearchLocation;
     EditText etSearchLocation;
     String parsedLocation;
+    private CameraUpdate camUpdate;
     static final LatLng UCSD = new LatLng(32.879657, -117.237566);
     static final LatLng UCSDGILMAN = new LatLng(32.877592, -117.233713);
     static final LatLng UCSDPARKINGLOT208 = new LatLng(32.880419, -117.242952);
@@ -94,8 +97,8 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL); //sets the maps view
         mMap.addMarker(new MarkerOptions().position(sanDiego).title("Park Smart Headquarters")); //pass in the LatLng object
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sanDiego, zoomLevel)); //move the camera to where the object is pointing
-
+        camUpdate = CameraUpdateFactory.newLatLngZoom(sanDiego, zoomLevel); //move the camera to where the object is pointing
+        mMap.animateCamera(camUpdate);
         if ( (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
 

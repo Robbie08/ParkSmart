@@ -85,6 +85,7 @@
         android:layout_height="wrap_content"
         android:text="@string/signIn"
         android:id="@+id/bLogIn"
+        android:background="@drawable/my_button"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         style="@style/Widget.AppCompat.Button.Colored"

@@ -1,4 +1,4 @@
-package com.example.robert.parksmart;
+package com.example.robert.parksmart.Activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -10,7 +10,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
+import com.example.robert.parksmart.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,7 +41,7 @@ public class User_ResetPassword extends AppCompatActivity {
         /*check if the user has put something in the email field*/
         if(TextUtils.isEmpty(email)){
             Toast.makeText(getApplicationContext(),"Please input your email",Toast.LENGTH_LONG).show();
-            return;
+            return;//
         }
 
         /*Verify if the user has an account and if they do or not handle*/

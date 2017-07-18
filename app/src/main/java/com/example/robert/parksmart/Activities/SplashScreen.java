@@ -1,14 +1,12 @@
-package com.example.robert.parksmart;
+package com.example.robert.parksmart.Activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
-import android.view.View;
 
+import com.example.robert.parksmart.MainActivity;
+import com.example.robert.parksmart.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 /**

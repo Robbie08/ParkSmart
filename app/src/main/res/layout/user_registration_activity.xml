@@ -36,6 +36,7 @@
         android:layout_marginRight="16dp"
         style="@style/Widget.AppCompat.Button.Colored"
         android:onClick="register"
+        android:background="@drawable/my_button"
         android:layout_marginBottom="70dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
