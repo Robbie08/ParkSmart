@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="180dp">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardview_location"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvCardViewLocationName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Location Name Goes Here"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tvCardVewDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Date Goes Here"
+                android:textSize="16sp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:id="@+id/tvCardVewTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time Goes Here"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:layout_alignTop="@+id/bCardViewDelete"
+                android:layout_alignEnd="@+id/tvCardVewDate" />
+
+            <Button
+                android:id="@+id/bCardViewGoToMap"
+                android:layout_width="100dp"
+                android:layout_height="28dp"
+                android:layout_alignBaseline="@+id/tvCardVewDate"
+                android:layout_alignBottom="@+id/tvCardVewDate"
+                android:layout_alignStart="@+id/bCardViewDelete"
+                android:background="@drawable/button_go_to_map"
+                android:text="Go To Map"
+                android:textColor="@color/colorWhite" />
+
+            <Button
+                android:id="@+id/bCardViewDelete"
+                android:layout_width="100dp"
+                android:layout_height="28dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginBottom="11dp"
+                android:layout_marginEnd="25dp"
+                android:background="@drawable/button_delete"
+                android:text="Delete"
+                android:textColor="@color/colorWhite" />
+        </RelativeLayout>
+
+
+    </android.support.v7.widget.CardView>
+
+
+
+</RelativeLayout>
