@@ -26,7 +26,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.robert.parksmart.R;
-import com.firebase.client.Firebase;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
@@ -44,7 +43,7 @@ public class Fragment_Park extends Fragment {
     View mView;
     EditText etLocationName;
     double latitude ,longitude ;
-    private Firebase mRef;
+   // private Firebase mRef;
     private ProgressDialog progressDialog;
     public String provider;
     private AlertDialog mBuilder;
@@ -56,8 +55,8 @@ public class Fragment_Park extends Fragment {
 
         /*Set Variables*/
         parkMyCar = (Button) view.findViewById(R.id.bParkMyCar); // button to save the users current location
-        Firebase.setAndroidContext(getContext()); // add context to the firebae object
-        mRef = new Firebase("https://parksmart-f23cb.firebaseio.com/"); // reference to our firebase databse
+//        Firebase.setAndroidContext(getContext()); // add context to the firebae object
+//        mRef = new Firebase("https://parksmart-f23cb.firebaseio.com/"); // reference to our firebase databse
         /*Progress Dialog Set Up*/
         progressDialog = new ProgressDialog(getContext()); // Create an instance of our ProgressDialog class
         progressDialog.setMessage("Saving Location..."); // set the message for our progress dialog
@@ -121,11 +120,11 @@ public class Fragment_Park extends Fragment {
 
                             try {
                         /*Send information to DB*/
-                                Firebase mRefChild = mRef.child("Current Latitude"); //create our child reference
-                                mRefChild.setValue(latitude); //send our location to our Databse
-
-                                Firebase mRefChild2 = mRef.child("Current Longitude"); //create a child
-                                mRefChild2.setValue(longitude); //send location to DB
+//                                Firebase mRefChild = mRef.child("Current Latitude"); //create our child reference
+//                                mRefChild.setValue(latitude); //send our location to our Databse
+//
+//                                Firebase mRefChild2 = mRef.child("Current Longitude"); //create a child
+//                                mRefChild2.setValue(longitude); //send location to DB
 
 
                             }catch (NullPointerException e){

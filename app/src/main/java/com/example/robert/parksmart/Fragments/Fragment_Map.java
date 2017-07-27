@@ -1,6 +1,7 @@
 package com.example.robert.parksmart.Fragments;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -18,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.example.robert.parksmart.JavaBeans.ParkingLotDetailsPOJO;
 import com.example.robert.parksmart.R;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,8 +30,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.OnClickListener, GoogleMap.OnInfoWindowClickListener {
@@ -42,18 +51,17 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     private EditText etSearchLocation;
     private String parsedLocation;
     private CameraUpdate camUpdate;
-
-    static final LatLng UCSD = new LatLng(32.879657, -117.237566);
-    static final LatLng UCSDGILMAN = new LatLng(32.877592, -117.233713);
-    static final LatLng UCSDPARKINGLOT208 = new LatLng(32.880419, -117.242952);
-    static final LatLng UCSDPARKINGLOT207 = new LatLng(32.880417, -117.241365);
-    static final LatLng UCSDPARKINGLOTP103 = new LatLng(32.873129, -117.242259);
+    private ProgressDialog progressDialog;
 
     float zoomLevel = (float) 12.0; //The zoom of the map
     float parkingZoomLevel = (float) 18.0; //The zoom of the map
     float schoolZoomLevel = (float) 14.5;
     float green = BitmapDescriptorFactory.HUE_GREEN;
 
+    private FirebaseDatabase database;
+    private DatabaseReference ref;
+
+    private ArrayList<ParkingLotDetailsPOJO> parkingLotDetails;
 
     //Set parameters to whatever data we would like to pass to that fragment.
 
@@ -68,7 +76,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
 
         Fragment_Map fragment_map = new Fragment_Map();
         Bundle args = new Bundle();
-        //args.putSerializable("DATA",someData);
+       // args.putSerializable();
         fragment_map.setArguments(args);
         return fragment_map;
     }
@@ -77,7 +85,10 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         view = inflater.inflate(R.layout.fragment_map, container, false);
+        parkingLotDetails = new ArrayList<>();
+        database = FirebaseDatabase.getInstance();
         bSearchLocation = (ImageButton) view.findViewById(R.id.bSearchLocation); //initialize searchLocation button
         etSearchLocation = (EditText) view.findViewById(R.id.etSearchLocation); //initialize searchLocation EditText
 
@@ -129,32 +140,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
                     Toast.LENGTH_LONG).show();
         }
 
-
-        Marker ucsdGilman = mMap.addMarker(new MarkerOptions()
-                .position(UCSDGILMAN)
-                .title("Gilman Parking Structure")
-                .snippet("Currently 63% Full").icon(BitmapDescriptorFactory.defaultMarker(green))
-        );
-
-        Marker ucsdParkingLot208 = mMap.addMarker(new MarkerOptions()
-                .position(UCSDPARKINGLOT208)
-                .title("UCSD Parking Lot 208")
-                .snippet("Currently 51% Full").icon(BitmapDescriptorFactory.defaultMarker(green))
-        );
-        Marker ucsdParkingLot207 = mMap.addMarker(new MarkerOptions()
-                .position(UCSDPARKINGLOT207)
-                .title("UCSD Parking Lot 207")
-                .snippet("Currently 39% Full").icon(BitmapDescriptorFactory.defaultMarker(green))
-        );
-        Marker ucsdParkingLotP303 = mMap.addMarker(new MarkerOptions()
-                .position(UCSDPARKINGLOTP103)
-                .title("UCSD Parking Lot P103")
-                .snippet("Currently 76% Full").icon(BitmapDescriptorFactory.defaultMarker(green))
-        );
-
-
-
-
         mMap.setOnInfoWindowClickListener(this);
 
     }
@@ -166,6 +151,10 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
      */
     @Override
     public void onClick(View view) {
+
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
 
         if(etSearchLocation != null) {
             parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
@@ -180,15 +169,50 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     }
 
     private void queryParkingData(String parsedLocation) {
-        /*Todo:
-             1. query parking POJOs into arraylist
-             2. Update Map
-        */
 
+        ref = database.getReference("Schools");
 
+        if(parsedLocation.equals("UCSD") || parsedLocation.equals("ucsd") || parsedLocation.equals("University of California San Diego")){
+            Log.d("mydebugger","inside condition");
 
+            ref = database.getReference("Schools/UCSD");
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
 
+                   // Log.d("mydebugger","" + dataSnapshot.getValue().toString());
+                    for(DataSnapshot messageSnapshot : dataSnapshot.getChildren()){
+                        ParkingLotDetailsPOJO pojo =  messageSnapshot.getValue(ParkingLotDetailsPOJO.class);
+                        parkingLotDetails.add(pojo);
+                        Log.d("Fragment_Map","children: " + messageSnapshot.getValue().toString());
+                    }
+                    updateUI();
 
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        }
+
+    }
+
+    private void updateUI() {
+        //Todo: Update the Google map with the new pojos in the arraylist.
+
+        for(int i = 0; i < parkingLotDetails.size();i++){
+            LatLng position = new LatLng(parkingLotDetails.get(i).getLatitude(),parkingLotDetails.get(i).getLongitude());
+            Marker parkingLotMarker = mMap.addMarker(new MarkerOptions()
+                    .position(position)
+                    .title(parkingLotDetails.get(i).getName())
+                    .snippet("Capacity: " + parkingLotDetails.get(i).getCapacity())
+                    .icon(BitmapDescriptorFactory.defaultMarker(green)));
+        }
+
+        progressDialog.dismiss();
     }
 
     /**
