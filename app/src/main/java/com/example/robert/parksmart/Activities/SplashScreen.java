@@ -14,7 +14,6 @@ import com.google.firebase.auth.FirebaseAuth;
  */
 
 public class SplashScreen extends AppCompatActivity {
-//This is a test change
         private FirebaseAuth firebaseAuth;
         private static int SPLASH_TIME_OUT = 2500;
 
