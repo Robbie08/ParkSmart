@@ -48,6 +48,16 @@ public class Fragment_Park extends Fragment {
     public String provider;
     private AlertDialog mBuilder;
 
+
+    public static Fragment_Park newInstance(){
+
+        Fragment_Park fragment_park = new Fragment_Park();
+        Bundle args = new Bundle();
+        // args.putSerializable();
+        fragment_park.setArguments(args);
+        return fragment_park;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {

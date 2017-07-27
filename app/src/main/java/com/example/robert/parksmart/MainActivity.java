@@ -150,13 +150,15 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
 
                         break;
                     case R.id.park_id:
-                        fragment_park = new Fragment_Park(); //create an instance of our Fragment_Park Class
+                      //  fragment_park = new Fragment_Park(); //create an instance of our Fragment_Park Class
+                       fragment_park = Fragment_Park.newInstance();//Input desired data, set data parameters
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, fragment_park).commit(); //pass in our fragment
                         break;
                     case R.id.recent_id:
-                        fmRecentLocations = new Fragment_RecentLocations(); //create an instance of our Fragment_RecentLocations class
+                        //fmRecentLocations = new Fragment_RecentLocations(); //create an instance of our Fragment_RecentLocations class
+                        fmRecentLocations = Fragment_RecentLocations.newInstance();
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.fragment_container,fmRecentLocations).commit();

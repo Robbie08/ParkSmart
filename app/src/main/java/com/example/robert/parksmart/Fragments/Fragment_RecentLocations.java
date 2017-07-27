@@ -21,12 +21,22 @@ import java.util.ArrayList;
 
 public class Fragment_RecentLocations extends Fragment {
 
-    View view;
-    RecyclerView recyclerView;
-    RecyclerView.Adapter adapter;
-    RecyclerView.LayoutManager layoutManager;
-    ArrayList<LocationCardView> list = new ArrayList<>();
-    String[] name,date,time;
+    private View view;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private ArrayList<LocationCardView> list = new ArrayList<>();
+    private String[] name,date,time;
+
+    public static Fragment_RecentLocations newInstance(){
+
+        Fragment_RecentLocations fragment_recentLocations = new Fragment_RecentLocations();
+        Bundle args = new Bundle();
+        // args.putSerializable("USER",user);
+        fragment_recentLocations.setArguments(args);
+        return fragment_recentLocations;
+    }
+
 
     @Nullable
     @Override
