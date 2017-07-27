@@ -22,6 +22,9 @@ public class SplashScreen extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.splash_screen);
 
+            firebaseAuth = FirebaseAuth.getInstance(); //create an instance of the FirebaseAuth class
+
+
 //            //create an action bar object that will utilize the support methods
 //            ActionBar actionBar = getSupportActionBar();
 //            //Hides our action bar via java and not .XML

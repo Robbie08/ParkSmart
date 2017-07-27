@@ -60,7 +60,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     /*
 
        The purpose of this approach is to ensure data is kept in the fragment.
-       Even when the Android OS decides to recreate the fragment.
+       Useful especially when the Android OS decides to recreate the fragment.
 
      */
 
@@ -172,8 +172,22 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         }
         onDataChanged.dataSend(parsedLocation); //pass data through the interface
         Log.d("TEST", "MyLocation: " +parsedLocation);
+
+        queryParkingData(parsedLocation);
         etSearchLocation.setText("");
         goToPlace(parsedLocation,schoolZoomLevel);
+
+    }
+
+    private void queryParkingData(String parsedLocation) {
+        /*Todo:
+             1. query parking POJOs into arraylist
+             2. Update Map
+        */
+
+
+
+
 
     }
 
