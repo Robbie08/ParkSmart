@@ -49,7 +49,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     private View view; // view object that will be returned in the onCreateView
     private ImageButton bSearchLocation;
     private EditText etSearchLocation;
-    private String parsedLocation;
+    private String parsedLocation , schoolName;
     private CameraUpdate camUpdate;
     private ProgressDialog progressDialog;
 
@@ -152,25 +152,26 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     @Override
     public void onClick(View view) {
 
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
 
-        if(etSearchLocation != null) {
+
+        if(!etSearchLocation.getText().toString().trim().equals("")) {
             parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
+            queryParkingData(parsedLocation);
+            etSearchLocation.setText("");
+            goToPlace(parsedLocation,schoolZoomLevel);
+
+        }else{
+            progressDialog.dismiss();
+            Toast.makeText(getActivity(),"Please input a school",Toast.LENGTH_LONG).show();
         }
-        onDataChanged.dataSend(parsedLocation); //pass data through the interface
-        Log.d("TEST", "MyLocation: " +parsedLocation);
-
-
-        queryParkingData(parsedLocation);
-        etSearchLocation.setText("");
-        goToPlace(parsedLocation,schoolZoomLevel);
 
     }
 
-    private void queryParkingData(String parsedLocation) {
+    public void queryParkingData(String parsedLocation) {
 
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
         ref = database.getReference("Schools");
 
         if(parsedLocation.equals("UCSD") || parsedLocation.equals("ucsd") || parsedLocation.equals("University of California San Diego")){
@@ -181,7 +182,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
-                   // Log.d("mydebugger","" + dataSnapshot.getValue().toString());
                     for(DataSnapshot messageSnapshot : dataSnapshot.getChildren()){
                         ParkingLotDetailsPOJO pojo =  messageSnapshot.getValue(ParkingLotDetailsPOJO.class);
                         parkingLotDetails.add(pojo);
@@ -203,6 +203,8 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
 
     private void updateUI() {
         //Todo: Update the Google map with the new pojos in the arraylist.
+
+
 
         for(int i = 0; i < parkingLotDetails.size();i++){
             LatLng position = new LatLng(parkingLotDetails.get(i).getLatitude(),parkingLotDetails.get(i).getLongitude());

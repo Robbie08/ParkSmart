@@ -4,6 +4,7 @@ package com.example.robert.parksmart;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,12 +17,17 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -29,9 +35,13 @@ import com.example.robert.parksmart.Activities.User_LogIn;
 import com.example.robert.parksmart.Fragments.Fragment_Map;
 import com.example.robert.parksmart.Fragments.Fragment_Park;
 import com.example.robert.parksmart.Fragments.Fragment_RecentLocations;
+import com.example.robert.parksmart.JavaBeans.AdapterSchoolNameCardView;
+import com.example.robert.parksmart.JavaBeans.SchoolName;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity implements Fragment_Map.onDataChanged {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements Fragment_Map.onDataChanged, SearchView.OnQueryTextListener {
 
     private Toolbar toolBar;
     private DrawerLayout drawerLayout;
@@ -44,10 +54,21 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
     private LocationManager locationManager;
     private LocationListener locationListener;
     private Location mLocation;
-
     private Bundle bundle;
     private FirebaseAuth firebaseAuth;
     private ProgressDialog progressDialog;
+
+    /*Create our list that we will pass in to the RecyclerView*/
+    public String[] schoolNames = {"University of California, San Diego","University of San Diego",
+                            "California State University, San Marcos","San Diego State University"};
+    RecyclerView recyclerViewSchools;
+    AdapterSchoolNameCardView adapterSchoolNameCardView;
+    RecyclerView.LayoutManager layoutManagerSchool;
+    ArrayList<SchoolName> schoolList = new ArrayList<>();
+
+    private final String schoolTest = "UCSD";
+
+    //TEST IS WRITTEN
 
 
 
@@ -58,12 +79,13 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         setContentView(R.layout.activity_start);
         toolBar = (Toolbar) findViewById(R.id.toolBar); //initialize toolbar
         setSupportActionBar(toolBar); //add toolbar to application
+        recyclerViewSchools = (RecyclerView) findViewById(R.id.recyclerViewSchools);
+        layoutManagerSchool = new LinearLayoutManager(this);
 
-        progressDialog = new ProgressDialog(this);
-        firebaseAuth = FirebaseAuth.getInstance();
 
-
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        progressDialog = new ProgressDialog(this); // will create a new ProgressDialog object
+        firebaseAuth = FirebaseAuth.getInstance(); // connect our FirebaseAuth by getting the currentInstance
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE); //
 
         locationListener = new LocationListener() {
             @Override
@@ -90,10 +112,12 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
             }
         };
 
+        /*Check if the user is singed in */
         if(firebaseAuth.getCurrentUser() == null){
 
+            //if the user is not signed in, finish the current Activity
             finish();
-            startActivity(new Intent(this,User_LogIn.class));
+            startActivity(new Intent(this,User_LogIn.class)); //send user to the SignIn Activity
 
         }
 
@@ -118,8 +142,6 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         }
 
         /* Start The App in the Map Fragment */
-
-       // fragment_map = new Fragment_Map(); //create an instance of Activity
         fragment_map = Fragment_Map.newInstance(); //Input desired data.
         getSupportFragmentManager() //make a reference to the getSupportFragmentManager
                 .beginTransaction() //start the process
@@ -143,21 +165,18 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
                 switch (item.getItemId()){
 
                     case R.id.home_id:
-
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, fragment_map).commit();// pass in our fragment
 
                         break;
                     case R.id.park_id:
-                      //  fragment_park = new Fragment_Park(); //create an instance of our Fragment_Park Class
                        fragment_park = Fragment_Park.newInstance();//Input desired data, set data parameters
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, fragment_park).commit(); //pass in our fragment
                         break;
                     case R.id.recent_id:
-                        //fmRecentLocations = new Fragment_RecentLocations(); //create an instance of our Fragment_RecentLocations class
                         fmRecentLocations = Fragment_RecentLocations.newInstance();
                         getSupportFragmentManager()
                                 .beginTransaction()
@@ -184,6 +203,18 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
 
     }
 
+    /**
+     * Method that weill log use out. Will call the singOut() from the FirebaseAuth
+     * Lib and then will perfrom a check to see if the user is still logged in our not.
+     * Using the getCurrentUser() from the FirebaseAuth Lib we will get the current user,
+     * if the method returns null then that means the user is successfully lgged off. In
+     * the given event that this method executes successfully the current Activity will
+     * close and then creating a new Instance the user will be sent to the LogIn Activity.
+     *
+     * If the user could not be signed our successgfully then a Toast MSG will appear and
+     * let the user know that he was not able to be logged out successfully and dismiss the
+     * progress and return.
+     */
     private void logUserOut(){
 
         try {
@@ -244,11 +275,92 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
     }
 
 
-
     @Override
     public void dataSend(String locationName) {
         //override the abstract method
         recievedValue = locationName;
         Log.d("RESULT-search",locationName);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.action_bar, menu);
+        //final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView =(SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setOnQueryTextListener(this);
+        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.action_search:
+                //call the list
+                // Retrieve the SearchView and plug it into SearchManager
+//                Fragment_Map map = (Fragment_Map) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+//                map.queryParkingData(schoolTest); // call the queryParkingData() that will search for the school chosen
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+
+    /*Updates our list based on the letter input*/
+    @Override
+    public boolean onQueryTextChange(String newText) {
+
+
+
+        ArrayList<SchoolName> newList = new ArrayList<>();
+
+        Log.d("queryText","newText: " + newText);
+
+        for(int i = 0; i < schoolNames.length;i++){
+            if(schoolNames[i].contains(newText)){
+                SchoolName schoolName = new SchoolName(schoolNames[i]);
+                newList.add(schoolName);
+            }
+        }
+
+      //  adapterSchoolNameCardView.setFilter(newList);
+
+//        newText = newText.toLowerCase(); // add the new string to as lowecase and save it
+//        ArrayList<SchoolName> newList = new ArrayList<>();
+//
+//        for(SchoolName schoolName : schoolList){
+//            //get the schoolName and convert it to lower case then store as String
+//            String names = schoolName.getSchool().toLowerCase();
+//            if(names.contains(newText)){
+//                //when the searchView is not empty
+//                newList.add(schoolName); // add our schoolNames that match to the newLsit
+//            }
+//        }
+
+        if(newList.size() == 0){
+            Log.d("test","newList is 0");
+        }else{
+            Log.d("test","nvm");
+            adapterSchoolNameCardView = new AdapterSchoolNameCardView(newList);
+            recyclerViewSchools.setAdapter(adapterSchoolNameCardView);
+            recyclerViewSchools.setLayoutManager(layoutManagerSchool);
+          //  recyclerViewSchools.setHasFixedSize(true);
+        }
+//        adapterSchoolNameCardView = new AdapterSchoolNameCardView(newList);
+//        recyclerViewSchools.setAdapter(adapterSchoolNameCardView);
+        //adapterSchoolNameCardView.setFilter(newList);
+        return true;
     }
 }

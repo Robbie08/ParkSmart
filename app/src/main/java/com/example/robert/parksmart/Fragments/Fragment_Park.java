@@ -11,11 +11,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.renderscript.Double2;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.AsyncLayoutInflater;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,9 +24,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.robert.parksmart.R;
-import com.google.android.gms.maps.model.LatLng;
-
-import java.io.IOException;
 
 /**
  * Created by Roberto on 6/13/2017.
@@ -86,8 +81,9 @@ public class Fragment_Park extends Fragment {
 
 
 
-        etLocationName  = (EditText) mView.findViewById(R.id.etLocationName);
+        etLocationName  = (EditText) mView.findViewById(R.id.etLocationName); // location name
         bAddLocation = (Button) mView.findViewById(R.id.bSaveLocation); //button for dialog box
+
 
 
         /*On Click Listener to save Location*/
@@ -104,6 +100,7 @@ public class Fragment_Park extends Fragment {
                         public void onClick(View view) {
                             try {
                                 parsedLocationName = etLocationName.getText().toString().trim();
+
                                 if (TextUtils.isEmpty(parsedLocationName)) {
                                     Toast.makeText(getContext(), "Please give your location a name", Toast.LENGTH_LONG).show();
                                     return;

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.robert.parksmart.JavaBeans.AdapterLocationCardView;
+
 import com.example.robert.parksmart.JavaBeans.LocationCardView;
 import com.example.robert.parksmart.R;
 
