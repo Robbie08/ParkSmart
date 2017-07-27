@@ -156,16 +156,16 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         progressDialog.setMessage("Please wait...");
         progressDialog.show();
 
-        if(etSearchLocation != null) {
+        if(!etSearchLocation.getText().toString().trim().equals("")) {
             parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
+            queryParkingData(parsedLocation);
+            etSearchLocation.setText("");
+            goToPlace(parsedLocation,schoolZoomLevel);
+
+        }else{
+            progressDialog.dismiss();
+            Toast.makeText(getActivity(),"Please input a school",Toast.LENGTH_LONG).show();
         }
-        onDataChanged.dataSend(parsedLocation); //pass data through the interface
-        Log.d("TEST", "MyLocation: " +parsedLocation);
-
-
-        queryParkingData(parsedLocation);
-        etSearchLocation.setText("");
-        goToPlace(parsedLocation,schoolZoomLevel);
 
     }
 
@@ -181,7 +181,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
-                   // Log.d("mydebugger","" + dataSnapshot.getValue().toString());
                     for(DataSnapshot messageSnapshot : dataSnapshot.getChildren()){
                         ParkingLotDetailsPOJO pojo =  messageSnapshot.getValue(ParkingLotDetailsPOJO.class);
                         parkingLotDetails.add(pojo);
