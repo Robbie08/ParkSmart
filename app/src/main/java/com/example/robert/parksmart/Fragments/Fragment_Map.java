@@ -162,6 +162,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         onDataChanged.dataSend(parsedLocation); //pass data through the interface
         Log.d("TEST", "MyLocation: " +parsedLocation);
 
+
         queryParkingData(parsedLocation);
         etSearchLocation.setText("");
         goToPlace(parsedLocation,schoolZoomLevel);
@@ -250,8 +251,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
                 Toast.makeText(getContext(),"Please Input A Place",Toast.LENGTH_LONG).show();
             }
         }
-
-
 
     }
 
