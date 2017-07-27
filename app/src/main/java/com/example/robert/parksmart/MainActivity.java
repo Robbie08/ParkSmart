@@ -33,18 +33,19 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements Fragment_Map.onDataChanged {
 
-    Toolbar toolBar;
-    DrawerLayout drawerLayout;
-    NavigationView navigationView;
-    Fragment_Map fragment_map; // Initialize an instance of our Fragment Class
-    ActionBarDrawerToggle actionBarDrawerToggle;
-    Fragment_RecentLocations fmRecentLocations;
-    Fragment_Park fragment_park; //create an instance of our Fragment_Park Class
-    String recievedValue, passedLocation;
-    LocationManager locationManager;
-    LocationListener locationListener;
-    Location mLocation;
-    Bundle bundle;
+    private Toolbar toolBar;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private Fragment_Map fragment_map; // Initialize an instance of our Fragment Class
+    private ActionBarDrawerToggle actionBarDrawerToggle;
+    private Fragment_RecentLocations fmRecentLocations;
+    private Fragment_Park fragment_park; //create an instance of our Fragment_Park Class
+    private String recievedValue, passedLocation;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private Location mLocation;
+
+    private Bundle bundle;
     private FirebaseAuth firebaseAuth;
     private ProgressDialog progressDialog;
 
@@ -52,21 +53,22 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         toolBar = (Toolbar) findViewById(R.id.toolBar); //initialize toolbar
         setSupportActionBar(toolBar); //add toolbar to application
-
-
 
         progressDialog = new ProgressDialog(this);
         firebaseAuth = FirebaseAuth.getInstance();
 
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+
                 Log.i("Location",location.toString()); //log current location
                 Log.i("My current Location", mLocation.toString()); // get current location
 
@@ -88,10 +90,11 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
             }
         };
 
-        //Check if the user is not logged in
         if(firebaseAuth.getCurrentUser() == null){
+
             finish();
             startActivity(new Intent(this,User_LogIn.class));
+
         }
 
         /*Check if device is running SDK < 23*/
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
             if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                 //if we dont have permission we will have to ask for it
                 ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1); //ask the user for permission
-            }else
+            } else
             {
                 //if permission has been granted previously
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
@@ -114,9 +117,10 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
             }
         }
 
+        /* Start The App in the Map Fragment */
 
-        /*Start The App in the Map Fragment*/
-        fragment_map = new Fragment_Map(); //create an instance of Activity
+       // fragment_map = new Fragment_Map(); //create an instance of Activity
+        fragment_map = Fragment_Map.newInstance(); //Input desired data.
         getSupportFragmentManager() //make a reference to the getSupportFragmentManager
                 .beginTransaction() //start the process
                 .add(R.id.fragment_container, fragment_map).commit(); //pass in the fragment into the container
@@ -137,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
 
 
                 switch (item.getItemId()){
+
                     case R.id.home_id:
 
                         getSupportFragmentManager()
@@ -203,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         }
 
     }
+
     /**
      * Method  will ask for permission to use the Phones Current GPS mLocation
      * if they have not done granted permssion before
@@ -210,7 +216,9 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
      * @param requestCode
      * @param permissions
      * @param grantResults
-     */
+     *
+     **/
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

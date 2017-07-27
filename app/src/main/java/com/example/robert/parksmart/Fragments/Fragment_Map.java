@@ -36,12 +36,13 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
 
     private GoogleMap mMap;
     private SupportMapFragment mSupportMapFragment;
-    onDataChanged onDataChanged; //create an instance of the Interface
-    View view; // view object that will be returned in the onCreateView
-    ImageButton bSearchLocation;
-    EditText etSearchLocation;
-    String parsedLocation;
+    private onDataChanged onDataChanged; //create an instance of the Interface
+    private View view; // view object that will be returned in the onCreateView
+    private ImageButton bSearchLocation;
+    private EditText etSearchLocation;
+    private String parsedLocation;
     private CameraUpdate camUpdate;
+
     static final LatLng UCSD = new LatLng(32.879657, -117.237566);
     static final LatLng UCSDGILMAN = new LatLng(32.877592, -117.233713);
     static final LatLng UCSDPARKINGLOT208 = new LatLng(32.880419, -117.242952);
@@ -52,6 +53,26 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     float parkingZoomLevel = (float) 18.0; //The zoom of the map
     float schoolZoomLevel = (float) 14.5;
     float green = BitmapDescriptorFactory.HUE_GREEN;
+
+
+    //Set parameters to whatever data we would like to pass to that fragment.
+
+    /*
+
+       The purpose of this approach is to ensure data is kept in the fragment.
+       Even when the Android OS decides to recreate the fragment.
+
+     */
+
+    public static Fragment_Map newInstance(){
+
+        Fragment_Map fragment_map = new Fragment_Map();
+        Bundle args = new Bundle();
+        //args.putSerializable("DATA",someData);
+        fragment_map.setArguments(args);
+        return fragment_map;
+    }
+
 
     @Nullable
     @Override
