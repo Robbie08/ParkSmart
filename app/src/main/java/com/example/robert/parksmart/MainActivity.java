@@ -26,8 +26,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -35,6 +37,7 @@ import com.example.robert.parksmart.Activities.User_LogIn;
 import com.example.robert.parksmart.Fragments.Fragment_Map;
 import com.example.robert.parksmart.Fragments.Fragment_Park;
 import com.example.robert.parksmart.Fragments.Fragment_RecentLocations;
+import com.example.robert.parksmart.Fragments.Fragment_SchoolsList;
 import com.example.robert.parksmart.JavaBeans.AdapterSchoolNameCardView;
 import com.example.robert.parksmart.JavaBeans.SchoolName;
 import com.google.firebase.auth.FirebaseAuth;
@@ -57,10 +60,11 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
     private Bundle bundle;
     private FirebaseAuth firebaseAuth;
     private ProgressDialog progressDialog;
+    private Fragment_SchoolsList fragSchoolList;
 
     /*Create our list that we will pass in to the RecyclerView*/
-    public String[] schoolNames = {"University of California, San Diego","University of San Diego",
-                            "California State University, San Marcos","San Diego State University"};
+    public String[] schoolNames = {"University of California, San Diego", "University of San Diego",
+            "California State University, San Marcos", "San Diego State University"};
     RecyclerView recyclerViewSchools;
     AdapterSchoolNameCardView adapterSchoolNameCardView;
     RecyclerView.LayoutManager layoutManagerSchool;
@@ -71,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
     //TEST IS WRITTEN
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -79,8 +82,8 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         setContentView(R.layout.activity_start);
         toolBar = (Toolbar) findViewById(R.id.toolBar); //initialize toolbar
         setSupportActionBar(toolBar); //add toolbar to application
-        recyclerViewSchools = (RecyclerView) findViewById(R.id.recyclerViewSchools);
-        layoutManagerSchool = new LinearLayoutManager(this);
+//        recyclerViewSchools = (RecyclerView) findViewById(R.id.recyclerViewSchools);
+//        layoutManagerSchool = new LinearLayoutManager(this);
 
 
         progressDialog = new ProgressDialog(this); // will create a new ProgressDialog object
@@ -91,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
             @Override
             public void onLocationChanged(Location location) {
 
-                Log.i("Location",location.toString()); //log current location
+                Log.i("Location", location.toString()); //log current location
                 Log.i("My current Location", mLocation.toString()); // get current location
 
             }
@@ -113,29 +116,28 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         };
 
         /*Check if the user is singed in */
-        if(firebaseAuth.getCurrentUser() == null){
+        if (firebaseAuth.getCurrentUser() == null) {
 
             //if the user is not signed in, finish the current Activity
             finish();
-            startActivity(new Intent(this,User_LogIn.class)); //send user to the SignIn Activity
+            startActivity(new Intent(this, User_LogIn.class)); //send user to the SignIn Activity
 
         }
 
         /*Check if device is running SDK < 23*/
-        if(Build.VERSION.SDK_INT < 23){
+        if (Build.VERSION.SDK_INT < 23) {
             // Permission is not needed on versions lower than SDK 23
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener); // update the users current mLocation
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener); // update the users current mLocation
             mLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER); //get the users mLocation one time
 
-        }else{
+        } else {
               /*Check if the user has given permission*/
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 //if we dont have permission we will have to ask for it
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1); //ask the user for permission
-            } else
-            {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1); //ask the user for permission
+            } else {
                 //if permission has been granted previously
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
                 mLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER); //get the users mLocation one time
 
             }
@@ -150,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         /*NavigationDrawer Code*/
         navigationView = (NavigationView) findViewById(R.id.navigation_view); //create an instance of NavigationView
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout); //initialize layout
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolBar,R.string.drawer_open,
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolBar, R.string.drawer_open,
                 R.string.drawer_close); //Create DrawerLayout object
         drawerLayout.setDrawerListener(actionBarDrawerToggle); //set up listener for actionBarDrawerToggle
 
@@ -162,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
 
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
 
                     case R.id.home_id:
                         getSupportFragmentManager()
@@ -171,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
 
                         break;
                     case R.id.park_id:
-                       fragment_park = Fragment_Park.newInstance();//Input desired data, set data parameters
+                        fragment_park = Fragment_Park.newInstance();//Input desired data, set data parameters
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, fragment_park).commit(); //pass in our fragment
@@ -180,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
                         fmRecentLocations = Fragment_RecentLocations.newInstance();
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.fragment_container,fmRecentLocations).commit();
+                                .replace(R.id.fragment_container, fmRecentLocations).commit();
                         break;
                     case R.id.signout_id:
                         progressDialog.setMessage("Signing Out...");
@@ -199,8 +201,6 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         });
 
 
-
-
     }
 
     /**
@@ -210,30 +210,30 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
      * if the method returns null then that means the user is successfully lgged off. In
      * the given event that this method executes successfully the current Activity will
      * close and then creating a new Instance the user will be sent to the LogIn Activity.
-     *
+     * <p>
      * If the user could not be signed our successgfully then a Toast MSG will appear and
      * let the user know that he was not able to be logged out successfully and dismiss the
      * progress and return.
      */
-    private void logUserOut(){
+    private void logUserOut() {
 
         try {
             firebaseAuth.signOut();
-            if(firebaseAuth.getCurrentUser() == null){
+            if (firebaseAuth.getCurrentUser() == null) {
                 finish();
-                Intent i = new Intent(MainActivity.this,User_LogIn.class);
+                Intent i = new Intent(MainActivity.this, User_LogIn.class);
                 startActivity(i);
                 progressDialog.dismiss();
-                Toast.makeText(getApplicationContext(),"Singed out Successfully",
+                Toast.makeText(getApplicationContext(), "Singed out Successfully",
                         Toast.LENGTH_LONG).show();
-            }else {
-                Toast.makeText(getApplicationContext(),"Could not sign out, please try again",
+            } else {
+                Toast.makeText(getApplicationContext(), "Could not sign out, please try again",
                         Toast.LENGTH_LONG).show();
                 progressDialog.dismiss();
                 return;
             }
-        }catch (Exception e){
-            Toast.makeText(getApplicationContext(),"Could not sign out, please try again",
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Could not sign out, please try again",
                     Toast.LENGTH_LONG).show();
             progressDialog.dismiss();
             return;
@@ -249,18 +249,17 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
      * @param requestCode
      * @param permissions
      * @param grantResults
-     *
      **/
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
              /*Check if the user has given permission*/
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 //if we do have permission we will get the users mLocation
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
                 mLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER); //get the users mLocation one time
 
             }
@@ -279,27 +278,38 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
     public void dataSend(String locationName) {
         //override the abstract method
         recievedValue = locationName;
-        Log.d("RESULT-search",locationName);
+        Log.d("RESULT-search", locationName);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_bar, menu);
         //final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
         MenuItem menuItem = menu.findItem(R.id.action_search);
-        SearchView searchView =(SearchView) MenuItemCompat.getActionView(menuItem);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setInputType(InputType.TYPE_CLASS_TEXT);
+        searchView.setQueryHint("Enter School...");
         searchView.setOnQueryTextListener(this);
         SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         return true;
+
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_search:
+
+                fragSchoolList = Fragment_SchoolsList.newInstance();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, fragSchoolList).commit();
+
                 //call the list
                 // Retrieve the SearchView and plug it into SearchManager
 //                Fragment_Map map = (Fragment_Map) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
@@ -317,50 +327,10 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         return false;
     }
 
-
-    /*Updates our list based on the letter input*/
     @Override
     public boolean onQueryTextChange(String newText) {
 
 
-
-        ArrayList<SchoolName> newList = new ArrayList<>();
-
-        Log.d("queryText","newText: " + newText);
-
-        for(int i = 0; i < schoolNames.length;i++){
-            if(schoolNames[i].contains(newText)){
-                SchoolName schoolName = new SchoolName(schoolNames[i]);
-                newList.add(schoolName);
-            }
-        }
-
-      //  adapterSchoolNameCardView.setFilter(newList);
-
-//        newText = newText.toLowerCase(); // add the new string to as lowecase and save it
-//        ArrayList<SchoolName> newList = new ArrayList<>();
-//
-//        for(SchoolName schoolName : schoolList){
-//            //get the schoolName and convert it to lower case then store as String
-//            String names = schoolName.getSchool().toLowerCase();
-//            if(names.contains(newText)){
-//                //when the searchView is not empty
-//                newList.add(schoolName); // add our schoolNames that match to the newLsit
-//            }
-//        }
-
-        if(newList.size() == 0){
-            Log.d("test","newList is 0");
-        }else{
-            Log.d("test","nvm");
-            adapterSchoolNameCardView = new AdapterSchoolNameCardView(newList);
-            recyclerViewSchools.setAdapter(adapterSchoolNameCardView);
-            recyclerViewSchools.setLayoutManager(layoutManagerSchool);
-          //  recyclerViewSchools.setHasFixedSize(true);
-        }
-//        adapterSchoolNameCardView = new AdapterSchoolNameCardView(newList);
-//        recyclerViewSchools.setAdapter(adapterSchoolNameCardView);
-        //adapterSchoolNameCardView.setFilter(newList);
-        return true;
+        return false;
     }
 }
