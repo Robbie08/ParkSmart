@@ -44,7 +44,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements Fragment_Map.onDataChanged, SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements Fragment_Map.onDataChanged {
 
     private Toolbar toolBar;
     private DrawerLayout drawerLayout;
@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
     private FirebaseAuth firebaseAuth;
     private ProgressDialog progressDialog;
     private Fragment_SchoolsList fragSchoolList;
+    private String mText;
 
     /*Create our list that we will pass in to the RecyclerView*/
     public String[] schoolNames = {"University of California, San Diego", "University of San Diego",
@@ -286,17 +287,65 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_bar, menu);
         //final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        MenuItem menuItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
-        searchView.setInputType(InputType.TYPE_CLASS_TEXT);
-        searchView.setQueryHint("Enter School...");
-        searchView.setOnQueryTextListener(this);
-        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        final MenuItem menuItem = menu.findItem(R.id.action_search);
+
+
+        MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+
+                        Log.d("SchoolSet","school: " +newText); // test value passed
+                        try{
+                            fragSchoolList = Fragment_SchoolsList.newInstance();
+                            fragSchoolList.searchQuery(newText);
+                            getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.fragment_container, fragSchoolList).commit();
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                        return false;
+                    }
+                });
+                //searchView.setOnQueryTextListener(this);
+                SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
+                searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+
+                try {
+                    fragment_map = new Fragment_Map(); //Input desired data.
+                    getSupportFragmentManager() //make a reference to the getSupportFragmentManager
+                            .beginTransaction() //start the process
+                            .add(R.id.fragment_container, fragment_map).commit(); //pass in the fragment into the container
+
+
+                } catch (Exception e){
+                    e.printStackTrace();
+                    return false;
+                }
+                return true;
+            }
+        });
+
 
         return true;
 
     }
+
 
 
     @Override
@@ -304,16 +353,6 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
 
         switch (item.getItemId()) {
             case R.id.action_search:
-
-                fragSchoolList = Fragment_SchoolsList.newInstance();
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, fragSchoolList).commit();
-
-                //call the list
-                // Retrieve the SearchView and plug it into SearchManager
-//                Fragment_Map map = (Fragment_Map) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-//                map.queryParkingData(schoolTest); // call the queryParkingData() that will search for the school chosen
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -321,16 +360,34 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         }
 
     }
+//
+//    @Override
+//    public boolean onQueryTextSubmit(String query) {
+//
+//
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean onQueryTextChange(String newText) {
+//
+//        //Log.d("QText","new text:" +newText);
+//
+//        Log.d("SchoolSet","school: " +newText); // test value passed
+//        try{
+//            fragSchoolList = Fragment_SchoolsList.newInstance();
+//            fragSchoolList.searchQuery(newText);
+//            getSupportFragmentManager()
+//                    .beginTransaction()
+//                    .replace(R.id.fragment_container, fragSchoolList).commit();
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
 
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
 
-    @Override
-    public boolean onQueryTextChange(String newText) {
-
-
-        return false;
+    public interface SearchSchoolList{
+        public void searchQuery(String val);
     }
 }
