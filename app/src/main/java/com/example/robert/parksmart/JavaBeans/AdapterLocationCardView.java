@@ -39,6 +39,7 @@ public class AdapterLocationCardView extends RecyclerView.Adapter<AdapterLocatio
         holder.locationName.setText(LOC.getName());
         holder.locationDate.setText(LOC.getDate());
         holder.locationTime.setText(LOC.getTime());
+
     }
 
     @Override
@@ -48,8 +49,8 @@ public class AdapterLocationCardView extends RecyclerView.Adapter<AdapterLocatio
 
     public static class LocationViewHolder extends RecyclerView.ViewHolder{
 
-        TextView locationName,locationTime,locationDate;
-        Button bGoToMap, bDelete;
+         TextView locationName,locationTime,locationDate;
+         Button bGoToMap, bDelete;
 
         public LocationViewHolder(View view){
             super(view);

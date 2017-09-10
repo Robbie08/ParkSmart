@@ -17,8 +17,7 @@
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:backgroundTint="@color/colorAccent"
-        android:tint="@color/colorWhite"
+        android:backgroundTint="@color/colorAccent"
         android:layout_gravity="top|end|center"
         android:layout_margin="16dp"
         android:layout_marginRight="@dimen/fab_margin_right"

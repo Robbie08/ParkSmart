@@ -24,6 +24,7 @@ import com.example.robert.parksmart.MainActivity;
 import com.example.robert.parksmart.R;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 /**
@@ -40,9 +41,6 @@ public class Fragment_SchoolsList extends Fragment implements MainActivity.Searc
             "Grossmont Community College","San Diego State University", "San Diego Mesa College",
             "San Francisco State University", "University of California, Berkeley",
             "University of California, Los Angeles", "University of California, San Diego","University of San Diego"};
-
-
-
 
     String qText;
     RecyclerView recyclerViewSchools;
@@ -82,26 +80,12 @@ public class Fragment_SchoolsList extends Fragment implements MainActivity.Searc
     }
 
 
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        inflater.inflate(R.menu.action_bar, menu);
-//        //final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-//        MenuItem menuItem = menu.findItem(R.id.action_search);
-//        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
-//        searchView.setInputType(InputType.TYPE_CLASS_TEXT);
-//        searchView.setQueryHint("Enter School...");
-//        searchView.setOnQueryTextListener(this);
-//        super.onCreateOptionsMenu(menu,inflater);
-////        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
-////        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-//
-//    }
 
 
-    private void createList(){
+    private  void createList(){
 
 
-        Log.d("QText","Value is: "+qText);
+        Log.d("QText","Value is: "+qText); //is our value passed into the searhView from the action bar
 
 
         /*Add the school names to the Recycler View */
@@ -113,12 +97,19 @@ public class Fragment_SchoolsList extends Fragment implements MainActivity.Searc
 
         }
 
-        if(schoolList.size() == 0){
-            Log.d("test","newList is 0");
-        }else{
-            Log.d("test","nvm");
 
-            adapterSchoolNameCardView = new AdapterSchoolNameCardView(schoolList);
+
+
+        if(schoolList.size() == 0){
+            //if the new list is composed of zero objects
+            Log.d("test","newList is 0");
+            return;
+
+        }else{
+            Log.d("test","list contains values");
+
+            /*Connect the recycler view with the data that will fill into the cardView objects*/
+            adapterSchoolNameCardView = new AdapterSchoolNameCardView(schoolList,getContext());
             recyclerViewSchools.setAdapter(adapterSchoolNameCardView);
             recyclerViewSchools.setLayoutManager(layoutManagerSchool);
             recyclerViewSchools.setHasFixedSize(true);
@@ -128,9 +119,10 @@ public class Fragment_SchoolsList extends Fragment implements MainActivity.Searc
 
     }
 
+
     @Override
     public void searchQuery(String val) {
         Log.d("SchoolCaught", "Value: "+val);
-        this.qText = val;
+        this.qText = val; // value passed in to the searchView
     }
 }

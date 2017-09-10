@@ -3,6 +3,7 @@ package com.example.robert.parksmart;
 
 
 import android.Manifest;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -16,35 +17,27 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.robert.parksmart.Activities.User_LogIn;
 import com.example.robert.parksmart.Fragments.Fragment_Map;
-import com.example.robert.parksmart.Fragments.Fragment_Park;
 import com.example.robert.parksmart.Fragments.Fragment_RecentLocations;
 import com.example.robert.parksmart.Fragments.Fragment_SchoolsList;
-import com.example.robert.parksmart.JavaBeans.AdapterSchoolNameCardView;
-import com.example.robert.parksmart.JavaBeans.SchoolName;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.ArrayList;
-
-public class MainActivity extends AppCompatActivity implements Fragment_Map.onDataChanged {
+public class MainActivity extends AppCompatActivity implements Fragment_Map.onDataChanged, Fragment_Map.OnLocationSaveSetListener{
 
     private Toolbar toolBar;
     private DrawerLayout drawerLayout;
@@ -52,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
     private Fragment_Map fragment_map; // Initialize an instance of our Fragment Class
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private Fragment_RecentLocations fmRecentLocations;
-    private Fragment_Park fragment_park; //create an instance of our Fragment_Park Class
     private String recievedValue, passedLocation;
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -62,16 +54,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
     private ProgressDialog progressDialog;
     private Fragment_SchoolsList fragSchoolList;
     private String mText;
-
-    /*Create our list that we will pass in to the RecyclerView*/
-    public String[] schoolNames = {"University of California, San Diego", "University of San Diego",
-            "California State University, San Marcos", "San Diego State University"};
-    RecyclerView recyclerViewSchools;
-    AdapterSchoolNameCardView adapterSchoolNameCardView;
-    RecyclerView.LayoutManager layoutManagerSchool;
-    ArrayList<SchoolName> schoolList = new ArrayList<>();
-
-    private final String schoolTest = "UCSD";
+    private String schoolNameString;
 
     //TEST IS WRITTEN
 
@@ -83,8 +66,39 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         setContentView(R.layout.activity_start);
         toolBar = (Toolbar) findViewById(R.id.toolBar); //initialize toolbar
         setSupportActionBar(toolBar); //add toolbar to application
-//        recyclerViewSchools = (RecyclerView) findViewById(R.id.recyclerViewSchools);
-//        layoutManagerSchool = new LinearLayoutManager(this);
+
+
+
+
+        /*RECEIVE THE DATA FROM THE ADAPTER CLASS*/
+//        Fragment_Map fMap = Fragment_Map.newInstance();
+//
+//
+//        /*Handle the object that is clicked from the School RecyclerView*/
+//        schoolNameString = getIntent().getStringExtra("schoolName"); // the name of the school from our objects in recycler view
+//        if(TextUtils.isEmpty(schoolNameString)){
+//            Log.d("SchoolName", "is empty: " +schoolNameString);
+//            schoolNameString = getIntent().getStringExtra("schoolName");
+//            Log.d("SchoolName", "not empty anymore: "+schoolNameString);
+//
+//            try{
+//                fMap.queryParkingData(schoolNameString);
+//            }catch (NullPointerException e){
+//                e.printStackTrace();
+//                Log.d("SchoolName","Bitch is still empty");
+//            }
+//        }else{
+//            Log.d("SchoolName", "Value: " +schoolNameString);
+//            try{
+//                fMap.queryParkingData(schoolNameString);
+//            }catch (Exception e){
+//                e.printStackTrace();
+//                Log.d("DataQuery", "Failed....");
+//            }
+//        }
+
+
+
 
 
         progressDialog = new ProgressDialog(this); // will create a new ProgressDialog object
@@ -96,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
             public void onLocationChanged(Location location) {
 
                 Log.i("Location", location.toString()); //log current location
-                Log.i("My current Location", mLocation.toString()); // get current location
 
             }
 
@@ -155,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout); //initialize layout
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolBar, R.string.drawer_open,
                 R.string.drawer_close); //Create DrawerLayout object
-        drawerLayout.setDrawerListener(actionBarDrawerToggle); //set up listener for actionBarDrawerToggle
+        drawerLayout.addDrawerListener(actionBarDrawerToggle); //set up listener for actionBarDrawerToggle
 
 
 
@@ -172,12 +185,6 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, fragment_map).commit();// pass in our fragment
 
-                        break;
-                    case R.id.park_id:
-                        fragment_park = Fragment_Park.newInstance();//Input desired data, set data parameters
-                        getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.fragment_container, fragment_park).commit(); //pass in our fragment
                         break;
                     case R.id.recent_id:
                         fmRecentLocations = Fragment_RecentLocations.newInstance();
@@ -270,8 +277,9 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        actionBarDrawerToggle.syncState();
+            super.onPostCreate(savedInstanceState);
+            actionBarDrawerToggle.syncState();
+
     }
 
 
@@ -317,7 +325,6 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
                         return false;
                     }
                 });
-                //searchView.setOnQueryTextListener(this);
                 SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
                 searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
                 return true;
@@ -360,32 +367,20 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
         }
 
     }
-//
-//    @Override
-//    public boolean onQueryTextSubmit(String query) {
-//
-//
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean onQueryTextChange(String newText) {
-//
-//        //Log.d("QText","new text:" +newText);
-//
-//        Log.d("SchoolSet","school: " +newText); // test value passed
-//        try{
-//            fragSchoolList = Fragment_SchoolsList.newInstance();
-//            fragSchoolList.searchQuery(newText);
-//            getSupportFragmentManager()
-//                    .beginTransaction()
-//                    .replace(R.id.fragment_container, fragSchoolList).commit();
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
 
+
+
+    /**
+     *   Will Transfer the data from Fragment_Map to Fragment_RecentLocations.
+     *   The data being transferred is a String an will contain the Name they gave
+     *   the location they will save
+     */
+    @Override
+    public void setLocationName(String locationName) {
+        Fragment_RecentLocations fragRecLoc = Fragment_RecentLocations.newInstance();
+        fragRecLoc.updateInfo(locationName);
+
+    }
 
     public interface SearchSchoolList{
         public void searchQuery(String val);
