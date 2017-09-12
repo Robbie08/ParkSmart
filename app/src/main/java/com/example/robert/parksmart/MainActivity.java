@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements Fragment_Map.onDa
     private String mText;
     private String schoolNameString;
 
+    //TESTING GIT BASH COMMIT
     //TEST IS WRITTEN
 
 

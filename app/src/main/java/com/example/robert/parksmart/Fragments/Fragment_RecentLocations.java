@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +34,7 @@ public class Fragment_RecentLocations extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    private ArrayList<LocationCardView> list = new ArrayList<>();
+    public static ArrayList<LocationCardView> list = new ArrayList<>();
     public static String date,time,locationName;
     private DateFormat formatDay, formatTime;
     Calendar calendar;
@@ -64,25 +65,15 @@ public class Fragment_RecentLocations extends Fragment {
         date = formatDay.format(calendar.getTime()); // declare our data
 
 
-//        int count = 0 ;
-//
-//        for(String Name : name){
-//            LocationCardView loc = new LocationCardView(Name,time,date);
-//            count++;
-//            list.add(loc);
-//        }
-
 
         adapter = new AdapterLocationCardView(list);
-
-
-
         LocationCardView loc = new LocationCardView(locationName, time, date);
-        list.add(loc);
-        //adapter.notifyItemInserted(list.size());
-        //adapter.notifyDataSetChanged();
 
-
+        if(!(TextUtils.isEmpty(locationName) || locationName.length() == 0)) {
+            //if the value is not null
+            list.add(loc); //add value to the list
+            locationName = "";// to reset value to prevent multiple items from being created
+        }
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewLocations);
         layoutManager = new LinearLayoutManager(getContext());
