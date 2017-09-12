@@ -1,30 +1,22 @@
 package com.example.robert.parksmart.Fragments;
 
 
-import android.app.SearchManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.robert.parksmart.JavaBeans.AdapterSchoolNameCardView;
-import com.example.robert.parksmart.JavaBeans.SchoolName;
-import com.example.robert.parksmart.MainActivity;
+import com.example.robert.parksmart.listServices.AdapterSchoolNameCardView;
+import com.example.robert.parksmart.enteties.SchoolName;
+import com.example.robert.parksmart.activities.MainActivity;
 import com.example.robert.parksmart.R;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 
 /**

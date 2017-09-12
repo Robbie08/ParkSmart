@@ -13,6 +13,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -20,19 +21,20 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.robert.parksmart.JavaBeans.AdapterSchoolNameCardView;
-import com.example.robert.parksmart.JavaBeans.ParkingLotDetailsPOJO;
+import com.example.robert.parksmart.listServices.AdapterSchoolNameCardView;
+import com.example.robert.parksmart.enteties.ParkingLotDetailsPOJO;
 import com.example.robert.parksmart.R;
+import com.example.robert.parksmart.services.HistoryListService;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -42,7 +44,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,12 +54,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.OnClickListener, GoogleMap.OnInfoWindowClickListener, AdapterSchoolNameCardView.OnLocationSelected{
 
     private GoogleMap mMap;
     private SupportMapFragment mSupportMapFragment;
     private onDataChanged onDataChanged; //create an instance of the Interface
-    private View view, mView; // view object that will be returned in the onCreateView
+    private View view, mView ,layout; // view object that will be returned in the onCreateView
     private ImageButton bSearchLocation;
     private EditText etSearchLocation;
     private CameraUpdate camUpdate;
@@ -87,6 +91,8 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     OnLocationSaveSetListener onLocationSaveSetListener;
 
 
+    @BindView(R.id.fab_save_location)
+    FloatingActionButton floatingActionButton;
 
     //Set parameters to whatever data we would like to pass to that fragment.
 
@@ -117,12 +123,15 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         bSearchLocation = (ImageButton) view.findViewById(R.id.bSearchLocation); //initialize searchLocation button
         etSearchLocation = (EditText) view.findViewById(R.id.etSearchLocation); //initialize searchLocation EditText
 
+
+        ButterKnife.bind(getActivity());
+
         /*Progress Dialog*/
         progSaveLoc = new ProgressDialog(getContext());
         progSaveLoc.setMessage("Saving Location...");
 
         alertDialog = new AlertDialog.Builder(getContext()).create();
-        mView = inflater.inflate(R.layout.dialog_location, container, false); //inflate dialog view
+        mView = inflater.inflate(R.layout.dialog_add_list, container, false); //inflate dialog view
 
         /*Location Manager Set Up*/
         criteria = new Criteria();
@@ -134,7 +143,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         provider = locationManager.getBestProvider(criteria,true);
 
         /*Declare Views in AlertDialog*/
-        etLocationName  = (EditText) mView.findViewById(R.id.etLocationName); // location name
+        etLocationName  = (EditText) mView.findViewById(R.id.dialog_add_list_editText); // location name
         bAddLocation = (Button) mView.findViewById(R.id.bSaveLocation); //button for dialog box
 
         recentLocations = Fragment_RecentLocations.newInstance();
@@ -206,7 +215,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         switch (view.getId()){
             case R.id.fab_save_location:
                 // handle the action of the Floating Action Button
-
                 try{
                     /*Manifest alertDialog*/
                     alertDialog.setView(mView);
@@ -217,8 +225,26 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
                             //AlertDialog button is clicked
                             try{
                                 parsedNameLocation = etLocationName.getText().toString().trim(); //getLocation
+
                                 if (!(TextUtils.isEmpty(parsedNameLocation))) {
                                     onLocationSaveSetListener.setLocationName(parsedNameLocation);
+
+                                    /*Check if the user has given permission */
+                                    if ((ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                                            ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+
+                                        //if we have permission
+                                        try {
+                                            Location location = locationManager.getLastKnownLocation(provider);//create a location and take in the provider
+                                            latitude = location.getLatitude(); //get an set our latitude
+                                            longitude = location.getLongitude(); //get an set our longitude
+                                        }catch (NullPointerException e){
+                                            Toast.makeText(getContext(),"NullPointerException Caught... You're Welcome",Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                    Log.d("Latitude", Double.toString(latitude));
+                                    Log.d("Longitude", Double.toString(longitude));
+
                                 }else{
                                     Toast.makeText(getContext(), "Please give your location a name", Toast.LENGTH_LONG).show();
                                     return;
@@ -230,26 +256,11 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
                                 return;
                             }
 
-                            /*Check if the user has given permission */
-                            if ((ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                                    ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
-
-                                //if we have permission
-                                try {
-                                    Location location = locationManager.getLastKnownLocation(provider);//create a location and take in the provider
-                                    latitude = location.getLatitude(); //get an set our latitude
-                                    longitude = location.getLongitude(); //get an set our longitude
-                                }catch (NullPointerException e){
-                                    Toast.makeText(getContext(),"NullPointerException Caught... You're Welcome",Toast.LENGTH_LONG).show();
-                                }
-                            }
 
                             /*Show our progress Dialog*/
                             progSaveLoc.show();
                             new BackGroundTask().execute(); //execute our background tasks
 
-                            Log.d("Latitude", Double.toString(latitude));
-                            Log.d("Longitude", Double.toString(longitude));
                         }
                     });
                 }catch (NullPointerException e){
@@ -259,6 +270,8 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
                 }
 
                 break;
+
+
             case R.id.bSearchLocation:
                 if(!etSearchLocation.getText().toString().trim().equals("")) {
                     parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
@@ -279,6 +292,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
 
 
     }
+
 
     public void queryParkingData(String locationPassed) {
 
