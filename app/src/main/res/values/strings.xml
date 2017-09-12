@@ -7,10 +7,10 @@
     <string name="search_school">Search School</string>
     <string name="fragment_recent_msg">This fragment will save all the locations where you have recently parked at. It\'s always good to keep track of where you have been!</string>
     <string name="email">Email</string>
-    <string name="password">password</string>
+    <string name="password">Password</string>
     <string name="signIn">Sign In</string>
     <string name="register">register</string>
-    <string name="tvSendLogIn">Already Registered? Log In</string>
+    <string name="tvSendLogIn">Log In</string>
     <string name="tvSendRegister">Register</string>
     <string name="user_login">Log In</string>
     <string name="the_cool_wall">The Cool Wall</string>
@@ -21,32 +21,7 @@
     <string name="forgot_password_msg">We just need your Email in order to send you password reset instructions</string>
     <string name="lbl_forgot_password">Forgot password?</string>
     <string name="stringLocation">San Diego Air Port</string>
+    <string name="UsersName">Please Enter Your Name</string>
+    <string name="parksmartlogo">ParkSmartLogo</string>
 
-   <string-array name="locationsName">
-       <item>ParkSmart HQ</item>
-       <item>UCSD Gilman Parking</item>
-       <item>Lestats Coffee House</item>
-       <item>San Diego Air Port</item>
-       <item>Old Town San Diego Trolley</item>
-       <item>LAX Parking</item>
-       <item>UTC Mall</item>
-   </string-array>
-    <string-array name="locationDate">
-        <item>07/20/2017</item>
-        <item>07/18/2017</item>
-        <item>07/13/2017</item>
-        <item>07/06/2017</item>
-        <item>07/01/2017</item>
-        <item>06/24/2017</item>
-        <item>06/21/2017</item>
-    </string-array>
-    <string-array name="locationTime">
-        <item>17:21</item>
-        <item>12:12</item>
-        <item>11:01</item>
-        <item>08:49</item>
-        <item>13:15</item>
-        <item>10:05</item>
-        <item>14:36</item>
-    </string-array>
 </resources>

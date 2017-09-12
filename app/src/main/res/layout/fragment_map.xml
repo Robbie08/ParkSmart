@@ -11,7 +11,8 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.robert.parksmart.Fragments.Fragment_Map" >
+        tools:context="com.example.robert.parksmart.Fragments.Fragment_Map"
+        tools:layout="@layout/fragment_map">
 
     </fragment>
     <android.support.design.widget.FloatingActionButton
@@ -23,7 +24,7 @@
         android:layout_margin="16dp"
         android:layout_marginRight="@dimen/fab_margin_right"
         android:layout_marginBottom="16dp"
-        android:src="@drawable/ic_save_white_24dp"
+        android:src="@drawable/pin_location_fab"
         android:elevation="6dp"
         android:id="@+id/fab_save_location"
         app:pressedTranslationZ="12dp"

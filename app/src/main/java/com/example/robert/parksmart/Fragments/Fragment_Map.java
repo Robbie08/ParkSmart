@@ -2,6 +2,7 @@ package com.example.robert.parksmart.Fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -14,7 +15,6 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -23,15 +23,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.robert.parksmart.JavaBeans.AdapterSchoolNameCardView;
-import com.example.robert.parksmart.JavaBeans.ParkingLotDetailsPOJO;
+import com.example.robert.parksmart.dialog.AddListDialogFragment;
+import com.example.robert.parksmart.listServices.AdapterSchoolNameCardView;
+import com.example.robert.parksmart.enteties.ParkingLotDetailsPOJO;
 import com.example.robert.parksmart.R;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -42,7 +42,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,12 +52,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.OnClickListener, GoogleMap.OnInfoWindowClickListener, AdapterSchoolNameCardView.OnLocationSelected{
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+public class Fragment_Map extends BaseFragment implements OnMapReadyCallback,GoogleMap.OnInfoWindowClickListener, AdapterSchoolNameCardView.OnLocationSelected {
 
     private GoogleMap mMap;
     private SupportMapFragment mSupportMapFragment;
     private onDataChanged onDataChanged; //create an instance of the Interface
-    private View view, mView; // view object that will be returned in the onCreateView
+    private View mView;
+    private View layout; // view object that will be returned in the onCreateView
     private ImageButton bSearchLocation;
     private EditText etSearchLocation;
     private CameraUpdate camUpdate;
@@ -76,32 +80,43 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     private FloatingActionButton fab_plus;
     private AlertDialog alertDialog;
     private LocationManager locationManager;
-    private String provider,parsedNameLocation, parsedLocation, schoolName;
+    private String provider, parsedNameLocation, parsedLocation, schoolName;
 
     private EditText etLocationName;
     private Button bAddLocation;
-    private double latitude,longitude;
+    private double latitude, longitude;
     Fragment_RecentLocations recentLocations;
     private ArrayList<ParkingLotDetailsPOJO> parkingLotDetails;
 
     OnLocationSaveSetListener onLocationSaveSetListener;
 
 
+    //Bind our button for our searchLocation
+    @BindView(R.id.bSearchLocation)
+    ImageButton setSearchLocation;
 
-    //Set parameters to whatever data we would like to pass to that fragment.
+    //Bind our button for our FAB
+    @BindView(R.id.fab_save_location)
+    FloatingActionButton setFabSaveLocation;
+
+    //Bind our editText for searchLocation
+    @BindView(R.id.etSearchLocation)
+    EditText searchLocation;
+//
+//    @BindView(R.id.dialog_add_list_editText) EditText  etLocationName;
+//
+//    @BindView(R.id.bSaveLocation) Button setSaveListName;
 
     /*
-
        The purpose of this approach is to ensure data is kept in the fragment.
        Useful especially when the Android OS decides to recreate the fragment.
-
      */
 
-    public static Fragment_Map newInstance(){
+    public static Fragment_Map newInstance() {
 
         Fragment_Map fragment_map = new Fragment_Map();
         Bundle args = new Bundle();
-       // args.putSerializable();
+        // args.putSerializable();
         fragment_map.setArguments(args);
         return fragment_map;
     }
@@ -111,18 +126,18 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        view = inflater.inflate(R.layout.fragment_map, container, false);
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
+        mView = inflater.inflate(R.layout.dialog_add_list, container, false); //inflate dialog view
         parkingLotDetails = new ArrayList<>();
         database = FirebaseDatabase.getInstance();
-        bSearchLocation = (ImageButton) view.findViewById(R.id.bSearchLocation); //initialize searchLocation button
-        etSearchLocation = (EditText) view.findViewById(R.id.etSearchLocation); //initialize searchLocation EditText
+        ButterKnife.bind(this, view);
+
 
         /*Progress Dialog*/
         progSaveLoc = new ProgressDialog(getContext());
         progSaveLoc.setMessage("Saving Location...");
 
         alertDialog = new AlertDialog.Builder(getContext()).create();
-        mView = inflater.inflate(R.layout.dialog_location, container, false); //inflate dialog view
 
         /*Location Manager Set Up*/
         criteria = new Criteria();
@@ -131,20 +146,15 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         criteria.setCostAllowed(true);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        provider = locationManager.getBestProvider(criteria,true);
+        provider = locationManager.getBestProvider(criteria, true);
 
         /*Declare Views in AlertDialog*/
-        etLocationName  = (EditText) mView.findViewById(R.id.etLocationName); // location name
+        etLocationName = (EditText) mView.findViewById(R.id.dialog_add_list_editText); // location name
         bAddLocation = (Button) mView.findViewById(R.id.bSaveLocation); //button for dialog box
 
         recentLocations = Fragment_RecentLocations.newInstance();
 
 
-        /*Floating Action Button SetUp*/
-        fab_plus = (FloatingActionButton) view.findViewById(R.id.fab_save_location);
-        fab_plus.setOnClickListener(this); //onClickListener for FAB
-
-        bSearchLocation.setOnClickListener(this); //will set up the onClick Listener
 
         mSupportMapFragment = SupportMapFragment.newInstance();
         FragmentManager fm = getFragmentManager();
@@ -182,110 +192,98 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         mMap.addMarker(new MarkerOptions().position(sanDiego).title("Park Smart Headquarters")); //pass in the LatLng object
         camUpdate = CameraUpdateFactory.newLatLngZoom(sanDiego, zoomLevel); //move the camera to where the object is pointing
         mMap.animateCamera(camUpdate);
-        if ( (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+        if ((ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
 
-           // mMap.setMyLocationEnabled(true);
-        }else {
-            Toast.makeText(getContext(),"Please Enable Location On Your Device To Use Google Maps",
+            // mMap.setMyLocationEnabled(true);
+        } else {
+            Toast.makeText(getContext(), "Please Enable Location On Your Device To Use Google Maps",
                     Toast.LENGTH_LONG).show();
         }
 
         mMap.setOnInfoWindowClickListener(this);
 
     }
+//
+//    /**
+//     * When the user clicks the search button
+//     *
+//     * @param view pass in the fragment
+//     */
+//    @Override
+//    public void onClick(View view) {
+//
+//        switch (view.getId()){
+//            case R.id.fab_save_location:
+//                // handle the action of the Floating Action Button
+//                try{
+//                    /*Manifest alertDialog*/
+//                    alertDialog.setView(mView);
+//                    alertDialog.show();
+//                    bAddLocation.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View view) {
+//                            //AlertDialog button is clicked
+//                            try{
+//                                parsedNameLocation = etLocationName.getText().toString().trim(); //getLocation
+//
+//                                if (!(TextUtils.isEmpty(parsedNameLocation))) {
+//                                    onLocationSaveSetListener.setLocationName(parsedNameLocation);
+//
+//                                    /*Check if the user has given permission */
+//                                    if ((ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+//                                            ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+//
+//                                        //if we have permission
+//                                        try {
+//                                            Location location = locationManager.getLastKnownLocation(provider);//create a location and take in the provider
+//                                            latitude = location.getLatitude(); //get an set our latitude
+//                                            longitude = location.getLongitude(); //get an set our longitude
+//                                        }catch (NullPointerException e){
+//                                            Toast.makeText(getContext(),"NullPointerException Caught... You're Welcome",Toast.LENGTH_LONG).show();
+//                                        }
+//                                    }
+//                                    Log.d("Latitude", Double.toString(latitude));
+//                                    Log.d("Longitude", Double.toString(longitude));
+//
+//                                }else{
+//                                    Toast.makeText(getContext(), "Please give your location a name", Toast.LENGTH_LONG).show();
+//                                    return;
+//                                }
+//
+//                            }catch (Exception e){
+//                                Log.d("ALERT DIALOG BUTTON", "The click event failed");
+//                                e.printStackTrace();
+//                                return;
+//                            }
+//
+//
+//                            /*Show our progress Dialog*/
+//                            progSaveLoc.show();
+//                            new BackGroundTask().execute(); //execute our background tasks
+//
+//                        }
+//                    });
+//                }catch (NullPointerException e){
+//                    Log.d("FLOATING ACTION BUTTON", "The click event failed");
+//                    e.printStackTrace();
+//                    return;
+//                }
+//
+//                break;
+//
+//
+//
+//    }
+//
 
-    /**
-     * When the user clicks the search button
-     *
-     * @param view pass in the fragment
-     */
-    @Override
-    public void onClick(View view) {
-
-        switch (view.getId()){
-            case R.id.fab_save_location:
-                // handle the action of the Floating Action Button
-
-                try{
-                    /*Manifest alertDialog*/
-                    alertDialog.setView(mView);
-                    alertDialog.show();
-                    bAddLocation.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            //AlertDialog button is clicked
-                            try{
-                                parsedNameLocation = etLocationName.getText().toString().trim(); //getLocation
-                                if (!(TextUtils.isEmpty(parsedNameLocation))) {
-                                    onLocationSaveSetListener.setLocationName(parsedNameLocation);
-                                }else{
-                                    Toast.makeText(getContext(), "Please give your location a name", Toast.LENGTH_LONG).show();
-                                    return;
-                                }
-
-                            }catch (Exception e){
-                                Log.d("ALERT DIALOG BUTTON", "The click event failed");
-                                e.printStackTrace();
-                                return;
-                            }
-
-                            /*Check if the user has given permission */
-                            if ((ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                                    ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
-
-                                //if we have permission
-                                try {
-                                    Location location = locationManager.getLastKnownLocation(provider);//create a location and take in the provider
-                                    latitude = location.getLatitude(); //get an set our latitude
-                                    longitude = location.getLongitude(); //get an set our longitude
-                                }catch (NullPointerException e){
-                                    Toast.makeText(getContext(),"NullPointerException Caught... You're Welcome",Toast.LENGTH_LONG).show();
-                                }
-                            }
-
-                            /*Show our progress Dialog*/
-                            progSaveLoc.show();
-                            new BackGroundTask().execute(); //execute our background tasks
-
-                            Log.d("Latitude", Double.toString(latitude));
-                            Log.d("Longitude", Double.toString(longitude));
-                        }
-                    });
-                }catch (NullPointerException e){
-                    Log.d("FLOATING ACTION BUTTON", "The click event failed");
-                    e.printStackTrace();
-                    return;
-                }
-
-                break;
-            case R.id.bSearchLocation:
-                if(!etSearchLocation.getText().toString().trim().equals("")) {
-                    parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
-                    //queryParkingData(parsedLocation);
-                    etSearchLocation.setText("");
-                    goToPlace(parsedLocation,schoolZoomLevel);
-
-                }else{
-                    progressDialog.dismiss();
-                    Toast.makeText(getActivity(),"Please input a school",Toast.LENGTH_LONG).show();
-                }
-                break;
-
-            default:
-                break;
-
-        }
-
-
-    }
 
     public void queryParkingData(String locationPassed) {
 
         parsedLocation = locationPassed;
-        Log.d("PassedValue"," value: "+parsedLocation);
+        Log.d("PassedValue", " value: " + parsedLocation);
 
-        if(TextUtils.isEmpty(parsedLocation) || parsedLocation.length() == 0){
+        if (TextUtils.isEmpty(parsedLocation) || parsedLocation.length() == 0) {
             parsedLocation = "UCSD";
         }
 
@@ -294,18 +292,18 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         progressDialog.show();
         ref = database.getReference("Schools");
 
-        if(parsedLocation.equals("UCSD") || parsedLocation.equals("ucsd") || parsedLocation.equals("University of California San Diego")){
-            Log.d("mydebugger","inside condition");
+        if (parsedLocation.equals("UCSD") || parsedLocation.equals("ucsd") || parsedLocation.equals("University of California San Diego")) {
+            Log.d("mydebugger", "inside condition");
 
             ref = database.getReference("Schools/UCSD");
             ref.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    for(DataSnapshot messageSnapshot : dataSnapshot.getChildren()){
-                        ParkingLotDetailsPOJO pojo =  messageSnapshot.getValue(ParkingLotDetailsPOJO.class);
+                    for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
+                        ParkingLotDetailsPOJO pojo = messageSnapshot.getValue(ParkingLotDetailsPOJO.class);
                         parkingLotDetails.add(pojo);
-                        Log.d("Fragment_Map","children: " + messageSnapshot.getValue().toString());
+                        Log.d("Fragment_Map", "children: " + messageSnapshot.getValue().toString().trim());
                     }
                     updateUI();
 
@@ -321,14 +319,57 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
 
     }
 
+
+    //click event for search bar on map fragment
+    @OnClick(R.id.bSearchLocation)
+    public void setSearchLocation() {
+
+        try {
+            if (!(etSearchLocation.getText().toString().trim().isEmpty())) {
+                parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
+                //queryParkingData(parsedLocation);
+                etSearchLocation.setText("");
+                goToPlace(parsedLocation, schoolZoomLevel);
+
+            } else {
+                Toast.makeText(getContext(), "Please input a school", Toast.LENGTH_LONG).show();
+
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    //Click event for FAB
+    @OnClick(R.id.fab_save_location)
+    public void setFavSaveLocation(){
+
+        Toast.makeText(getContext(),"This button worked" , Toast.LENGTH_LONG).show();
+        try{
+            /*Manifest alertDialog*/
+            alertDialog.setView(mView);
+            alertDialog.show();
+
+            DialogFragment dialogFragment = AddListDialogFragment.newInstance();
+            dialogFragment.show(dialogFragment.getFragmentManager(), AddListDialogFragment.class.getSimpleName());
+
+        }catch (NullPointerException e){
+            Log.d("FLOATING ACTION BUTTON", "The click event failed");
+            e.printStackTrace();
+            return;
+        }
+
+    }
+
     private void updateUI() {
-        //Todo: Update the Google map with the new pojos in the arraylist.
+        /* Todo: Update the Google map with the new pojos in the arraylist. */
 
 
 
         for(int i = 0; i < parkingLotDetails.size();i++){
             LatLng position = new LatLng(parkingLotDetails.get(i).getLatitude(),parkingLotDetails.get(i).getLongitude());
-            Marker parkingLotMarker = mMap.addMarker(new MarkerOptions()
+            mMap.addMarker(new MarkerOptions()
                     .position(position)
                     .title(parkingLotDetails.get(i).getName())
                     .snippet("Capacity: " + parkingLotDetails.get(i).getCapacity())
@@ -403,7 +444,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
             onDataChanged = (onDataChanged) context;
         }catch (Exception ex){
             Toast.makeText(getContext(),"Please Try Again",Toast.LENGTH_LONG).show();
-            return;
         }
     }
 

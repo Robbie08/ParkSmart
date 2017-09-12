@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL"/>
+    <uses-permission android:name="android.voicemail.permission.READ_VOICEMAIL"/>
 
 
 
@@ -22,18 +23,40 @@
         android:roundIcon="@mipmap/ic_park_smart_logo"
         android:largeHeap="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".Activities.SplashScreen">
+        android:theme="@style/AppTheme"
+        android:name=".infrastructure.ParkSmartApplication">
+        <activity android:name=".activities.SplashScreenActivity"
+            android:enabled="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.User_LogIn"></activity>
-        <activity android:name=".MainActivity" />
-        <activity android:name=".Activities.User_Registration"></activity>
-        <activity android:name=".Activities.User_ResetPassword"></activity>
+
+        <activity android:name=".activities.LoginActivity"
+            android:enabled="true"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name=".activities.MainActivity"
+            android:enabled="true"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name=".activities.RegisterActivity"
+            android:enabled="true"
+            android:theme="@style/Theme.Design.NoActionBar"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name=".activities.ForgotPasswordActivity"
+            android:enabled="true"
+            android:theme="@style/Theme.Design.NoActionBar"
+            android:screenOrientation="portrait">
+        </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
