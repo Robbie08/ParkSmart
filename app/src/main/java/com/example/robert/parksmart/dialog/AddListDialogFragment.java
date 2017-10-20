@@ -9,7 +9,6 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,9 +30,6 @@ public class AddListDialogFragment extends BaseDialog implements View.OnClickLis
 
     @BindView(R.id.dialog_add_list_editText)
     EditText newLocationName;
-
-    @BindView(R.id.fab_save_location)
-    FloatingActionButton saveLocation;
 
     public AddListDialogFragment(){}
     public static AddListDialogFragment newInstance(){

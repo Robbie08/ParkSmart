@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -35,7 +34,6 @@ public class ForgotPasswordActivity extends BaseActivity {
     TextView backToLogin;
 
     private ProgressDialog mProgressDialog;
-    private CoordinatorLayout coordinatorLayout;
 
 
     @Override
@@ -49,8 +47,6 @@ public class ForgotPasswordActivity extends BaseActivity {
         mProgressDialog.setMessage("Attempting To Find Users Information");
         mProgressDialog.setCancelable(false); //user cant dismiss this
 
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout_forgot_password);
-
     }
 
 
@@ -59,7 +55,7 @@ public class ForgotPasswordActivity extends BaseActivity {
     public void setResetPasswordButton(){
         String email = userEmail.getText().toString().trim();
         String packagedEmail = email.toLowerCase();
-        bus.post(new AccountServices.ResetUserPasswordRequest(packagedEmail,mProgressDialog,coordinatorLayout));
+        bus.post(new AccountServices.ResetUserPasswordRequest(packagedEmail,mProgressDialog));
     }
 
 

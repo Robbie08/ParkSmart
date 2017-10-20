@@ -1,9 +1,5 @@
 package com.example.robert.parksmart.infrastructure;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-
 import java.util.HashMap;
 
 /**
@@ -34,5 +30,4 @@ public class ServiceResponse {
         //if the user has not made any errors
         return (propertyErrors.size() == 0);
     }
-
 }

@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.robert.parksmart.infrastructure.ParkSmartApplication;
-import com.example.robert.parksmart.infrastructure.Utils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.otto.Bus;
 
@@ -43,19 +42,13 @@ public class BaseFragment extends Fragment {
         application = (ParkSmartApplication) getActivity().getApplication();
         bus = application.getBus();
         bus.register(this);
-
-
-        /* Allows us to get the userEmail and userName to all of our Dialog Fragments*/
-        userEmail = getActivity().getSharedPreferences(Utils.MY_PREFERENCE, Context.MODE_PRIVATE).getString(Utils.EMAIL,"");
-        userName = getActivity().getSharedPreferences(Utils.MY_PREFERENCE,Context.MODE_PRIVATE).getString(Utils.USERNAME,"");
-
         return view;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //bus.unregister(this);
+        bus.unregister(this);
     }
 }
 

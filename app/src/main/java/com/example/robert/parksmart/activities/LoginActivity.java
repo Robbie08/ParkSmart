@@ -6,10 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -49,7 +46,6 @@ import com.squareup.otto.Subscribe;
     EditText etEmail;
 
 
-    private CoordinatorLayout coordinatorLayout;
     private ProgressDialog mProgressDialog;
 
     private SharedPreferences sharedPreferences;
@@ -66,10 +62,6 @@ import com.squareup.otto.Subscribe;
         mProgressDialog.setMessage("Attempting to Log User In");
         mProgressDialog.setCancelable(false); //user cant dismiss this
         sharedPreferences = getSharedPreferences(Utils.MY_PREFERENCE, Context.MODE_PRIVATE);
-
-
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id
-                .coordinatorLayout);
 
 
     }
@@ -95,25 +87,20 @@ import com.squareup.otto.Subscribe;
         String packagedEmail = email.toLowerCase();
         /*Call our constructor from the AccountService.LogUserInRequest(email,password,progressDialog)*/
         bus.post(new AccountServices.LogUserInRequest(packagedEmail,etPassword.getText().toString().trim(),
-                mProgressDialog,sharedPreferences,coordinatorLayout));
+                mProgressDialog,sharedPreferences));
     }
 
 
     /*Will keep track of errors*/
     @Subscribe
     public void LogUserIn(AccountServices.LogUserInResponse response){
-
-        Log.d("LOGIN RESPONSE", "Response happened");
         if(!response.didSucceede()){
             /* If there are any errors, prompt the user with the errors*/
             etEmail.setError(response.getPropertyError("email"));
             etPassword.setError(response.getPropertyError("password"));
-
         }
-
     }
 
 
 }
-
 
