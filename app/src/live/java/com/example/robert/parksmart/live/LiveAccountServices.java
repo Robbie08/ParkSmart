@@ -3,9 +3,11 @@ package com.example.robert.parksmart.live;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -88,7 +90,8 @@ public class LiveAccountServices extends BaseLiveService{
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(!task.isSuccessful()) {
                                 request.progressDialog.dismiss();
-                                Toast.makeText(application.getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                Snackbar snackbar = Snackbar.make(request.coordinatorLayout,task.getException().getMessage(),Snackbar.LENGTH_LONG);
+                                snackbar.show();
                                 Log.d("EMAIL: ", request.userEmail);
 
                             }else{
@@ -115,9 +118,10 @@ public class LiveAccountServices extends BaseLiveService{
                                                     request.progressDialog.dismiss();
 
                                                     /*Once user has registered in correctly it will send them to the main activity*/
+                                                    Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(request.context,android.R.anim.fade_in,android.R.anim.fade_out).toBundle();
                                                     Intent intent = new Intent(application.getApplicationContext(), LoginActivity.class);
                                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                    application.startActivity(intent);
+                                                    application.startActivity(intent,bundle);
                                                 }
                                             }
                                         });
@@ -142,7 +146,7 @@ public class LiveAccountServices extends BaseLiveService{
     @Subscribe
     public void LogInUser(final AccountServices.LogUserInRequest request){
 
-        AccountServices.LogUserInResponse response = new AccountServices.LogUserInResponse();
+        final AccountServices.LogUserInResponse response = new AccountServices.LogUserInResponse();
 
         if(request.userEmail.isEmpty()){
             response.setPropertyErrors("email","Please enter your email");
@@ -160,7 +164,8 @@ public class LiveAccountServices extends BaseLiveService{
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(!task.isSuccessful()){
                                 request.progressDialog.dismiss();
-                                Toast.makeText(application.getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                Snackbar snackbar = Snackbar.make(request.coordinatorLayout,task.getException().getMessage(),Snackbar.LENGTH_LONG);
+                                snackbar.show();
                                 Log.d("EMAIL: ", request.userEmail);
                                 Log.d("PASSWORD: ", request.userPassword);
                             } else{
@@ -172,6 +177,8 @@ public class LiveAccountServices extends BaseLiveService{
                                         User user = dataSnapshot.getValue(User.class);
                                         if(user != null){
 
+//                                            Snackbar snackbar = Snackbar.make(request.context,"Welcome !",Snackbar.LENGTH_LONG);
+//                                            snackbar.show();
                                             Toast.makeText(application.getApplicationContext(),"Successfully Logged In!",Toast.LENGTH_LONG).show();
                                             userLocation.child("hasLoggedInWithPassword").setValue(true);
                                             SharedPreferences sharedPreferences = request.sharedPreferences;
@@ -181,13 +188,15 @@ public class LiveAccountServices extends BaseLiveService{
                                             request.progressDialog.dismiss();
 
                                             /*Once user has logged in correctly it will send them to the main activity*/
+
+                                            Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(request.context,R.anim.fade_in,R.anim.fade_out).toBundle();
                                             Intent intent = new Intent(application.getApplicationContext(), MainActivity.class);
                                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            application.startActivity(intent);
+                                            application.startActivity(intent,bundle);
                                         } else {
                                             request.progressDialog.dismiss();
-                                            Toast.makeText(application.getApplicationContext(), "Failed to connect to server, Please try Again later",
-                                                    Toast.LENGTH_LONG).show();
+                                            Snackbar snackbar = Snackbar.make(request.coordinatorLayout,"Failed to connect to server, Please try again later",Snackbar.LENGTH_LONG);
+                                            snackbar.show();
                                         }
                                     }
 
@@ -195,7 +204,8 @@ public class LiveAccountServices extends BaseLiveService{
                                     @Override
                                     public void onCancelled(FirebaseError firebaseError) {
                                         request.progressDialog.dismiss();
-                                        Toast.makeText(application.getApplicationContext(), firebaseError.getMessage(), Toast.LENGTH_LONG).show();
+                                        Snackbar snackbar = Snackbar.make(request.coordinatorLayout,firebaseError.getMessage(),Snackbar.LENGTH_LONG);
+                                        snackbar.show();
                                     }
                                 });
                             }
@@ -233,7 +243,8 @@ public class LiveAccountServices extends BaseLiveService{
                             if(!task.isSuccessful()){
                                 //if the email is not recognized by firebase
                                 request.progressDialog.dismiss();
-                                Toast.makeText(application.getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                Snackbar snackbar = Snackbar.make(request.coordinatorLayout,task.getException().getMessage(),Snackbar.LENGTH_LONG);
+                                snackbar.show();
                             }else {
                                 request.progressDialog.dismiss();
                                 Toast.makeText(application.getApplicationContext(), "We have sent you instructions to reset your password!", Toast.LENGTH_SHORT).show();

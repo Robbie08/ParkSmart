@@ -25,6 +25,7 @@ public class SplashScreenActivity extends BaseActivity {
                 public void run() {
                     //handle what happens after our timeout
                     startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                    overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
                     finish();
                 }
 

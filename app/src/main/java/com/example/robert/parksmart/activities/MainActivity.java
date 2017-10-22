@@ -34,7 +34,9 @@ import com.example.robert.parksmart.Fragments.Fragment_Map;
 import com.example.robert.parksmart.Fragments.Fragment_RecentLocations;
 import com.example.robert.parksmart.Fragments.Fragment_SchoolsList;
 import com.example.robert.parksmart.infrastructure.Utils;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 
 public class MainActivity extends BaseActivity implements Fragment_Map.onDataChanged, Fragment_Map.OnLocationSaveSetListener{
 
@@ -167,8 +169,16 @@ public class MainActivity extends BaseActivity implements Fragment_Map.onDataCha
                         SharedPreferences.Editor editor = sharedPreferences2.edit();
                         editor.putString(Utils.EMAIL,null).apply();
                         editor.putString(Utils.USERNAME,null).apply();
-                        auth.signOut();
+                        try {
+                            auth.signOut();
+                            Toast.makeText(getApplicationContext(), "Successfully signed out!", Toast.LENGTH_LONG).show();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), "Did not log off correctly!", Toast.LENGTH_LONG).show();
+
+                        }
                         startActivity(new Intent(getApplicationContext(),LoginActivity.class));
+                        overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
                         finish();
                         break;
 

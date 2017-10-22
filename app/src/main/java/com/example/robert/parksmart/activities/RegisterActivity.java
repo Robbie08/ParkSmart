@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,6 +44,7 @@ public class RegisterActivity extends BaseActivity {
 
 
     ProgressDialog mProgressDialog;
+    private CoordinatorLayout coordinatorLayout;
 
 
     @Override
@@ -55,13 +57,18 @@ public class RegisterActivity extends BaseActivity {
         mProgressDialog.setTitle("Loading...");
         mProgressDialog.setMessage("Attempting to Register Account");
         mProgressDialog.setCancelable(false); //user cant dismiss this
+
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout_registration);
     }
 
     /*send user back to the registration activity*/
     @OnClick(R.id.activity_register_send_login_activity)
     public void sendLogIn(View view){
         startActivity(new Intent(this,LoginActivity.class));
+        overridePendingTransition(android.R.anim.slide_out_right,android.R.anim.slide_in_left );
         finish();
+
+
     }
 
     /*Button that will register the user  */
@@ -69,7 +76,7 @@ public class RegisterActivity extends BaseActivity {
     public void setbRegister(){
         String email = userEmail.getText().toString().trim();
         String packagedEmail = email.toLowerCase();
-        bus.post(new AccountServices.RegisterUserRequest(packagedEmail,userName.getText().toString(),mProgressDialog));
+        bus.post(new AccountServices.RegisterUserRequest(packagedEmail,userName.getText().toString(),mProgressDialog,coordinatorLayout, this));
 
     }
 
