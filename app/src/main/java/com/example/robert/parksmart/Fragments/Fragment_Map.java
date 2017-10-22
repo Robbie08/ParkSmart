@@ -31,6 +31,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.robert.parksmart.infrastructure.Utils;
 import com.example.robert.parksmart.listServices.AdapterSchoolNameCardView;
 import com.example.robert.parksmart.enteties.ParkingLotDetailsPOJO;
 import com.example.robert.parksmart.R;
@@ -49,22 +50,25 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.otto.Bus;
 
 import java.io.IOException;
+import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.OnClickListener, GoogleMap.OnInfoWindowClickListener, AdapterSchoolNameCardView.OnLocationSelected{
+public class Fragment_Map extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, AdapterSchoolNameCardView.OnLocationSelected{
 
     private GoogleMap mMap;
     private SupportMapFragment mSupportMapFragment;
     private onDataChanged onDataChanged; //create an instance of the Interface
     private View view, mView ,layout; // view object that will be returned in the onCreateView
-    private ImageButton bSearchLocation;
-    private EditText etSearchLocation;
+//    private ImageButton bSearchLocation;
+    //private EditText etSearchLocation;
     private CameraUpdate camUpdate;
     private ProgressDialog progressDialog, progSaveLoc;
 
@@ -94,6 +98,12 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
     @BindView(R.id.fab_save_location)
     FloatingActionButton floatingActionButton;
 
+    @BindView(R.id.bSearchLocation)
+    ImageButton bSearchLocation;
+
+    @BindView(R.id.etSearchLocation)
+    EditText etSearchLocation;
+
     //Set parameters to whatever data we would like to pass to that fragment.
 
     /*
@@ -120,11 +130,9 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         view = inflater.inflate(R.layout.fragment_map, container, false);
         parkingLotDetails = new ArrayList<>();
         database = FirebaseDatabase.getInstance();
-        bSearchLocation = (ImageButton) view.findViewById(R.id.bSearchLocation); //initialize searchLocation button
-        etSearchLocation = (EditText) view.findViewById(R.id.etSearchLocation); //initialize searchLocation EditText
-
-
-        ButterKnife.bind(getActivity());
+//        bSearchLocation = (ImageButton) view.findViewById(R.id.bSearchLocation); //initialize searchLocation button
+//        etSearchLocation = (EditText) view.findViewById(R.id.etSearchLocation); //initialize searchLocation EditText
+        ButterKnife.bind(this, view);
 
         /*Progress Dialog*/
         progSaveLoc = new ProgressDialog(getContext());
@@ -149,11 +157,11 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
         recentLocations = Fragment_RecentLocations.newInstance();
 
 
-        /*Floating Action Button SetUp*/
-        fab_plus = (FloatingActionButton) view.findViewById(R.id.fab_save_location);
-        fab_plus.setOnClickListener(this); //onClickListener for FAB
+//        /*Floating Action Button SetUp*/
+//        fab_plus = (FloatingActionButton) view.findViewById(R.id.fab_save_location);
+//        fab_plus.setOnClickListener(this); //onClickListener for FAB
 
-        bSearchLocation.setOnClickListener(this); //will set up the onClick Listener
+//        bSearchLocation.setOnClickListener(this); //will set up the onClick Listener
 
         mSupportMapFragment = SupportMapFragment.newInstance();
         FragmentManager fm = getFragmentManager();
@@ -168,6 +176,35 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
 
 
         return view;
+    }
+
+    @OnClick(R.id.fab_save_location)
+    public void setFloatingActionButton(){
+        //display the alert dialog
+        Toast.makeText(getContext(),"FAB Working Properly",Toast.LENGTH_LONG).show();
+    }
+
+    @OnClick(R.id.bSearchLocation)
+    public void setbSearchLocation(){
+
+        //Toast.makeText(getContext(),"Search bar Working Properly",Toast.LENGTH_LONG).show();
+        if (!(TextUtils.isEmpty(etSearchLocation.getText().toString().trim()))) {
+            try {
+                parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
+                //queryParkingData(parsedLocation);
+                etSearchLocation.setText("");
+                goToPlace(parsedLocation, schoolZoomLevel);
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(getActivity(),"Please input a school", Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+        if(TextUtils.isEmpty(etSearchLocation.getText().toString().trim())){
+            Toast.makeText(getActivity(),"Please input a school",Toast.LENGTH_LONG).show();
+        }
+
     }
 
 
@@ -204,94 +241,94 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, View.O
 
     }
 
-    /**
-     * When the user clicks the search button
-     *
-     * @param view pass in the fragment
-     */
-    @Override
-    public void onClick(View view) {
-
-        switch (view.getId()){
-            case R.id.fab_save_location:
-                // handle the action of the Floating Action Button
-                try{
-                    /*Manifest alertDialog*/
-                    alertDialog.setView(mView);
-                    alertDialog.show();
-                    bAddLocation.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            //AlertDialog button is clicked
-                            try{
-                                parsedNameLocation = etLocationName.getText().toString().trim(); //getLocation
-
-                                if (!(TextUtils.isEmpty(parsedNameLocation))) {
-                                    onLocationSaveSetListener.setLocationName(parsedNameLocation);
-
-                                    /*Check if the user has given permission */
-                                    if ((ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                                            ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
-
-                                        //if we have permission
-                                        try {
-                                            Location location = locationManager.getLastKnownLocation(provider);//create a location and take in the provider
-                                            latitude = location.getLatitude(); //get an set our latitude
-                                            longitude = location.getLongitude(); //get an set our longitude
-                                        }catch (NullPointerException e){
-                                            Toast.makeText(getContext(),"NullPointerException Caught... You're Welcome",Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                    Log.d("Latitude", Double.toString(latitude));
-                                    Log.d("Longitude", Double.toString(longitude));
-
-                                }else{
-                                    Toast.makeText(getContext(), "Please give your location a name", Toast.LENGTH_LONG).show();
-                                    return;
-                                }
-
-                            }catch (Exception e){
-                                Log.d("ALERT DIALOG BUTTON", "The click event failed");
-                                e.printStackTrace();
-                                return;
-                            }
-
-
-                            /*Show our progress Dialog*/
-                            progSaveLoc.show();
-                            new BackGroundTask().execute(); //execute our background tasks
-
-                        }
-                    });
-                }catch (NullPointerException e){
-                    Log.d("FLOATING ACTION BUTTON", "The click event failed");
-                    e.printStackTrace();
-                    return;
-                }
-
-                break;
-
-
-            case R.id.bSearchLocation:
-                if(!etSearchLocation.getText().toString().trim().equals("")) {
-                    parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
-                    //queryParkingData(parsedLocation);
-                    etSearchLocation.setText("");
-                    goToPlace(parsedLocation,schoolZoomLevel);
-
-                }else{
-                    progressDialog.dismiss();
-                    Toast.makeText(getActivity(),"Please input a school",Toast.LENGTH_LONG).show();
-                }
-                break;
-
-            default:
-                break;
-
-        }
-
-
-    }
+//    /**
+//     * When the user clicks the search button
+//     *
+//     * @param view pass in the fragment
+//     */
+//    @Override
+//    public void onClick(View view) {
+//
+//        switch (view.getId()){
+//            case R.id.fab_save_location:
+//                // handle the action of the Floating Action Button
+//                try{
+//                    /*Manifest alertDialog*/
+//                    alertDialog.setView(mView);
+//                    alertDialog.show();
+//                    bAddLocation.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View view) {
+//                            //AlertDialog button is clicked
+//                            try{
+//                                parsedNameLocation = etLocationName.getText().toString().trim(); //getLocation
+//
+//                                if (!(TextUtils.isEmpty(parsedNameLocation))) {
+//                                    onLocationSaveSetListener.setLocationName(parsedNameLocation);
+//
+//                                    /*Check if the user has given permission */
+//                                    if ((ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+//                                            ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+//
+//                                        //if we have permission
+//                                        try {
+//                                            Location location = locationManager.getLastKnownLocation(provider);//create a location and take in the provider
+//                                            latitude = location.getLatitude(); //get an set our latitude
+//                                            longitude = location.getLongitude(); //get an set our longitude
+//                                        }catch (NullPointerException e){
+//                                            Toast.makeText(getContext(),"NullPointerException Caught... You're Welcome",Toast.LENGTH_LONG).show();
+//                                        }
+//                                    }
+//                                    Log.d("Latitude", Double.toString(latitude));
+//                                    Log.d("Longitude", Double.toString(longitude));
+//
+//                                }else{
+//                                    Toast.makeText(getContext(), "Please give your location a name", Toast.LENGTH_LONG).show();
+//                                    return;
+//                                }
+//
+//                            }catch (Exception e){
+//                                Log.d("ALERT DIALOG BUTTON", "The click event failed");
+//                                e.printStackTrace();
+//                                return;
+//                            }
+//
+//
+//                            /*Show our progress Dialog*/
+//                            progSaveLoc.show();
+//                            new BackGroundTask().execute(); //execute our background tasks
+//
+//                        }
+//                    });
+//                }catch (NullPointerException e){
+//                    Log.d("FLOATING ACTION BUTTON", "The click event failed");
+//                    e.printStackTrace();
+//                    return;
+//                }
+//
+//                break;
+//
+//
+//            case R.id.bSearchLocation:
+//                if(!etSearchLocation.getText().toString().trim().equals("")) {
+//                    parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
+//                    //queryParkingData(parsedLocation);
+//                    etSearchLocation.setText("");
+//                    goToPlace(parsedLocation,schoolZoomLevel);
+//
+//                }else{
+//                    progressDialog.dismiss();
+//                    Toast.makeText(getActivity(),"Please input a school",Toast.LENGTH_LONG).show();
+//                }
+//                break;
+//
+//            default:
+//                break;
+//
+//        }
+//
+//
+//    }
 
 
     public void queryParkingData(String locationPassed) {
