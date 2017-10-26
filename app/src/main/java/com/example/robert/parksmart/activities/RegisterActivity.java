@@ -65,7 +65,6 @@ public class RegisterActivity extends BaseActivity {
     @OnClick(R.id.activity_register_send_login_activity)
     public void sendLogIn(View view){
         startActivity(new Intent(this,LoginActivity.class));
-        overridePendingTransition(android.R.anim.slide_out_right,android.R.anim.slide_in_left );
         finish();
 
 

@@ -2,6 +2,8 @@ package com.example.robert.parksmart.Fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -31,6 +33,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.robert.parksmart.dialog.AddListDialogFragment;
 import com.example.robert.parksmart.infrastructure.Utils;
 import com.example.robert.parksmart.listServices.AdapterSchoolNameCardView;
 import com.example.robert.parksmart.enteties.ParkingLotDetailsPOJO;
@@ -130,8 +133,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
         view = inflater.inflate(R.layout.fragment_map, container, false);
         parkingLotDetails = new ArrayList<>();
         database = FirebaseDatabase.getInstance();
-//        bSearchLocation = (ImageButton) view.findViewById(R.id.bSearchLocation); //initialize searchLocation button
-//        etSearchLocation = (EditText) view.findViewById(R.id.etSearchLocation); //initialize searchLocation EditText
         ButterKnife.bind(this, view);
 
         /*Progress Dialog*/
@@ -151,17 +152,10 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
         provider = locationManager.getBestProvider(criteria,true);
 
         /*Declare Views in AlertDialog*/
-        etLocationName  = (EditText) mView.findViewById(R.id.dialog_add_list_editText); // location name
-        bAddLocation = (Button) mView.findViewById(R.id.bSaveLocation); //button for dialog box
+        //etLocationName  = (EditText) mView.findViewById(R.id.dialog_add_list_editText); // location name
+        //bAddLocation = (Button) mView.findViewById(R.id.bSaveLocation); //button for dialog box
 
         recentLocations = Fragment_RecentLocations.newInstance();
-
-
-//        /*Floating Action Button SetUp*/
-//        fab_plus = (FloatingActionButton) view.findViewById(R.id.fab_save_location);
-//        fab_plus.setOnClickListener(this); //onClickListener for FAB
-
-//        bSearchLocation.setOnClickListener(this); //will set up the onClick Listener
 
         mSupportMapFragment = SupportMapFragment.newInstance();
         FragmentManager fm = getFragmentManager();
@@ -181,7 +175,9 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
     @OnClick(R.id.fab_save_location)
     public void setFloatingActionButton(){
         //display the alert dialog
-        Toast.makeText(getContext(),"FAB Working Properly",Toast.LENGTH_LONG).show();
+        DialogFragment  dialogFragment= AddListDialogFragment.newInstance();
+        dialogFragment.show(getActivity().getFragmentManager(), AddListDialogFragment.class.getSimpleName());
+
     }
 
     @OnClick(R.id.bSearchLocation)
@@ -198,9 +194,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
                 e.printStackTrace();
                 Toast.makeText(getActivity(),"Please input a school", Toast.LENGTH_LONG).show();
             }
-
         }
-
         if(TextUtils.isEmpty(etSearchLocation.getText().toString().trim())){
             Toast.makeText(getActivity(),"Please input a school",Toast.LENGTH_LONG).show();
         }
@@ -241,6 +235,7 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
 
     }
 
+//    The old version of DialogFragment is hidden here
 //    /**
 //     * When the user clicks the search button
 //     *

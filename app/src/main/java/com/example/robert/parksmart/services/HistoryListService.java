@@ -12,12 +12,13 @@ public class HistoryListService {
 
     public static class HistoryListRequest{
 
-        public String historyListName;
+        public String listName;
         public String ownerName;
         public String ownerEmail;
 
-        public HistoryListRequest(String historyListName, String ownerName, String ownerEmail) {
-            this.historyListName = historyListName;
+
+        public HistoryListRequest(String listName, String ownerName, String ownerEmail) {
+            this.listName = listName;
             this.ownerName = ownerName;
             this.ownerEmail = ownerEmail;
         }

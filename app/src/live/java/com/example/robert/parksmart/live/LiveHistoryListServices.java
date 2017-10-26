@@ -1,9 +1,12 @@
 package com.example.robert.parksmart.live;
 
+import android.widget.Toast;
+
+
+import com.example.robert.parksmart.enteties.HistoryList;
 import com.example.robert.parksmart.infrastructure.ParkSmartApplication;
 import com.example.robert.parksmart.infrastructure.Utils;
 import com.example.robert.parksmart.services.HistoryListService;
-import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import com.firebase.client.Firebase;
 import com.google.firebase.database.ServerValue;
 import com.squareup.otto.Subscribe;
@@ -24,42 +27,30 @@ public class LiveHistoryListServices extends BaseLiveService {
     public void addItem(final HistoryListService.HistoryListRequest request){
         final HistoryListService.HistoryListResponse response = new HistoryListService.HistoryListResponse();
 
-        if(request.ownerEmail.isEmpty()){
-            //if null is passed to the owner email
-            response.setPropertyErrors("EMAIL","No email found");
-        }
-
-        if(request.ownerName.isEmpty()){
-            //if null is passed to the owner Name
-            response.setPropertyErrors("USERNAME","No user name was found");
+        if(request.listName.isEmpty()){
+            response.setPropertyErrors("listName","Please give a name to the location");
         }
 
         if(response.didSucceede()){
             //if the task returned no errors
-
-            Firebase reference = new Firebase(Utils.FIRE_BASE_USER_REFERENCE );
-
-            /*Add timeStamp to HashMap*/
-            HashMap<String, Object> timeJoined = new HashMap<>();
-            timeJoined.put("dateLocationAdded", ServerValue.TIMESTAMP);
-
-            /*Create and populate our path*/
-            reference.child("child").setValue(request.ownerEmail);
-            reference.child("listName").setValue(request.historyListName);
-            //reference.child("location").setValue(request.location);
-            reference.child("name").setValue(request.ownerEmail);
-            reference.child("timeJoined").setValue(timeJoined);
+            Firebase reference = new Firebase(Utils.FIRE_BASE_HISTORY_LIST_REFERENCE+request.ownerEmail).push();
+            HashMap<String,Object> timeStampCreated = new HashMap<>();
+            timeStampCreated.put("timestamp",ServerValue.TIMESTAMP);
+            HistoryList historyList = new HistoryList(reference.getKey(),request.listName,Utils.decodeEmail(request.ownerEmail),
+                    request.ownerName,timeStampCreated);
+            reference.child("id").setValue(historyList.getId());
+            reference.child("listName").setValue(historyList.getListName());
+            reference.child("ownerEmail").setValue(historyList.getOwnerEmail());
+            reference.child("ownerName").setValue(historyList.getOwnerName());
+            reference.child("dateCreated").setValue(historyList.getDateCreated());
+            reference.child("dateLastChanged").setValue(historyList.getDateLastChanged());
 
 
-
-            /*
-
-            Connect Floating action bar with the AddListDialogFragment
-
-            */
-
-
-
+            Toast.makeText(application.getApplicationContext()," List has been created",
+                    Toast.LENGTH_LONG).show();
         }
+
+        bus.post(response);
     }
 }
+

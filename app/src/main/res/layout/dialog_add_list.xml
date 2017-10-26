@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="49dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:id="@+id/linearLayout2">
@@ -21,8 +22,9 @@
             android:text="Give this location a name"
             android:textSize="24sp"
             android:gravity="center"
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp"/>
+            android:textColor="@color/colorBlack"
+            android:paddingBottom="16dp"
+            android:paddingTop="16dp"/>
 
         <EditText
             android:layout_width="match_parent"
@@ -39,19 +41,5 @@
             android:singleLine="true"/>
     </LinearLayout>
 
-    <Button
-        android:id="@+id/bSaveLocation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/linearLayout2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/my_button"
-        android:text="Save Location"
-        android:textColor="@color/colorWhite"
-        />
 
 </RelativeLayout>

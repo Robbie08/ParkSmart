@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class HistoryList {
     private String id;
     private String listName;
-    private String userEmail;
+    private String ownerEmail;
     private String ownerName;
     private HashMap<String,Object> dateCreated;
     private HashMap<String,Object> dateLastChanged;
@@ -19,13 +19,13 @@ public class HistoryList {
     public HistoryList(){
     }
 
-    public HistoryList(String id, String listName, String userEmail, String ownerName, HashMap<String, Object> dateCreated, HashMap<String, Object> dateLastChanged) {
+    public HistoryList(String id, String listName, String userEmail, String ownerName, HashMap<String, Object> dateCreated) {
         this.id = id;
         this.listName = listName;
-        this.userEmail = userEmail;
+        this.ownerEmail = userEmail;
         this.ownerName = ownerName;
         this.dateCreated = dateCreated;
-        this.dateLastChanged = dateLastChanged;
+
 
         HashMap<String,Object> dateLastChangedObject = new HashMap<>();
         dateLastChangedObject.put("date", ServerValue.TIMESTAMP);
@@ -41,8 +41,8 @@ public class HistoryList {
         return listName;
     }
 
-    public String getUserEmail() {
-        return userEmail;
+    public String getOwnerEmail() {
+        return ownerEmail;
     }
 
     public String getOwnerName() {
