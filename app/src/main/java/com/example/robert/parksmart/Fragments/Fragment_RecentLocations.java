@@ -68,6 +68,11 @@ public class Fragment_RecentLocations extends BaseFragment {
         time = formatTime.format(calendar.getTime()); //declare our time
         date = formatDay.format(calendar.getTime()); // declare our data
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> master
         adapter = new AdapterLocationCardView(list);
         LocationCardView loc = new LocationCardView(locationName, time, date);
 
