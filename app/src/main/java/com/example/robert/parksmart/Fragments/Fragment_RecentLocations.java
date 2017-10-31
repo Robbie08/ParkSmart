@@ -1,46 +1,48 @@
 package com.example.robert.parksmart.Fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.robert.parksmart.listServices.AdapterLocationCardView;
+import com.example.robert.parksmart.enteties.HistoryList;
 
+import com.example.robert.parksmart.infrastructure.Utils;
 import com.example.robert.parksmart.listServices.LocationCardView;
 import com.example.robert.parksmart.R;
+import com.example.robert.parksmart.views.HistoryListViews.HistoryListViewHolder;
+import com.firebase.client.Firebase;
+import com.firebase.ui.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
 
 import butterknife.ButterKnife;
 
-/**
- * Created by Roberto on 7/7/2017.
- */
-
 public class Fragment_RecentLocations extends BaseFragment {
 
-    private View view;
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
+    View view;
+    RecyclerView recyclerView;
+    //private RecyclerView.Adapter adapter;
+    FirebaseRecyclerAdapter adapter;
+    Context ctx;
+    LinearLayoutManager manager;
     public static ArrayList<LocationCardView> list = new ArrayList<>();
     public static String date,time,locationName;
     private DateFormat formatDay, formatTime;
     Calendar calendar;
+    String userEmail;
 
+    public  Fragment_RecentLocations(){}
 
     public static Fragment_RecentLocations newInstance(){
 
@@ -56,42 +58,57 @@ public class Fragment_RecentLocations extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_recent_location, container,false);
         ButterKnife.bind(this,view);
-
-
-        calendar = Calendar.getInstance();
-
-        //Initialize our DateFormat Objects
-        formatDay = new SimpleDateFormat("MM/dd/yyyy",Locale.US);
-        formatTime = new SimpleDateFormat("HH:mm:ss", Locale.US);
-
-        //name = getResources().getStringArray(R.array.locationsName);
-        time = formatTime.format(calendar.getTime()); //declare our time
-        date = formatDay.format(calendar.getTime()); // declare our data
-
-<<<<<<< HEAD
-=======
-
-
->>>>>>> master
-        adapter = new AdapterLocationCardView(list);
-        LocationCardView loc = new LocationCardView(locationName, time, date);
-
-        if(!(TextUtils.isEmpty(locationName) || locationName.length() == 0)) {
-            //if the value is not null
-            list.add(loc); //add value to the list
-            locationName = "";// to reset value to prevent multiple items from being created
-        }
-
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewLocations);
-        layoutManager = new LinearLayoutManager(getContext().getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
-
-        recyclerView.setAdapter(adapter);
+        recyclerView = (RecyclerView) view.findViewById(R.id.history_list_recycler_view);
 
         return view;
 
 
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ctx = getContext();
+        manager = new LinearLayoutManager(ctx);
+        userEmail = getActivity().getSharedPreferences(Utils.MY_PREFERENCE, Context.MODE_PRIVATE).getString(Utils.EMAIL,"");
+
+
+
+        Firebase historyListRef = new Firebase(Utils.FIRE_BASE_HISTORY_LIST_REFERENCE +userEmail);
+
+        adapter = new FirebaseRecyclerAdapter<HistoryList, HistoryListViewHolder>(HistoryList.class,
+                R.layout.list_history_list,
+                HistoryListViewHolder.class,
+                historyListRef) {
+
+            @Override
+            protected void populateViewHolder(HistoryListViewHolder historyListViewHolder, final HistoryList historyList, int i) {
+                historyListViewHolder.populate(historyList);
+                historyListViewHolder.setIsRecyclable(true);
+                historyListViewHolder.layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(getContext().getApplicationContext(), historyList.getListName() +
+                                " was clicked", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        };
+
+
+        manager.setReverseLayout(true);
+        manager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(manager);
+        recyclerView.setAdapter(adapter);
+
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        adapter.cleanup();
     }
 
     public void updateInfo(String nm){

@@ -163,6 +163,7 @@ public class MainActivity extends BaseActivity implements Fragment_Map.onDataCha
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, fmRecentLocations).commit();
+
                         break;
                     case R.id.signout_id:
                         SharedPreferences sharedPreferences2 = getSharedPreferences(Utils.MY_PREFERENCE, Context.MODE_PRIVATE);

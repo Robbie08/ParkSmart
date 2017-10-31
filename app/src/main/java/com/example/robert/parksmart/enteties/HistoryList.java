@@ -28,7 +28,7 @@ public class HistoryList {
 
 
         HashMap<String,Object> dateLastChangedObject = new HashMap<>();
-        dateLastChangedObject.put("date", ServerValue.TIMESTAMP);
+        dateLastChangedObject.put("timestamp", ServerValue.TIMESTAMP);
 
         this.dateLastChanged = dateLastChangedObject;
     }
@@ -56,7 +56,7 @@ public class HistoryList {
         }
 
         HashMap<String,Object> dateCreatedObject = new HashMap<>();
-        dateCreatedObject.put("date",ServerValue.TIMESTAMP);
+        dateCreatedObject.put("timestamp",ServerValue.TIMESTAMP);
         return dateCreatedObject;
     }
 

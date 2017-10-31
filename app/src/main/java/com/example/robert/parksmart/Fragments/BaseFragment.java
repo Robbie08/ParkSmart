@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.robert.parksmart.infrastructure.ParkSmartApplication;
+import com.example.robert.parksmart.infrastructure.Utils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.otto.Bus;
 
@@ -28,7 +29,7 @@ import butterknife.ButterKnife;
 public class BaseFragment extends Fragment {
     protected ParkSmartApplication application;
     protected Bus bus;
-    protected String userEmail, userName;
+    protected String  userName;
     protected FirebaseAuth.AuthStateListener authStateListener;
     protected FirebaseAuth auth;
     protected SharedPreferences sharedPreferences;
@@ -42,6 +43,10 @@ public class BaseFragment extends Fragment {
         application = (ParkSmartApplication) getActivity().getApplication();
         bus = application.getBus();
         bus.register(this);
+
+         /* Allows us to get the userEmail and userName to all of our Dialog Fragments*/
+        //userEmail = getActivity().getSharedPreferences(Utils.MY_PREFERENCE, Context.MODE_PRIVATE).getString(Utils.EMAIL,"");
+        userName = getActivity().getSharedPreferences(Utils.MY_PREFERENCE,Context.MODE_PRIVATE).getString(Utils.USERNAME,"");
         return view;
     }
 
