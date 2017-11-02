@@ -13,10 +13,6 @@ import com.squareup.otto.Subscribe;
 
 import java.util.HashMap;
 
-/**
- * Created by ortiz on 10/12/2017.
- */
-
 public class LiveHistoryListServices extends BaseLiveService {
     public LiveHistoryListServices(ParkSmartApplication application){
         super(application);
@@ -46,11 +42,17 @@ public class LiveHistoryListServices extends BaseLiveService {
             reference.child("dateLastChanged").setValue(historyList.getDateLastChanged());
 
 
-            Toast.makeText(application.getApplicationContext()," List has been created",
+            Toast.makeText(application.getApplicationContext()," Location has been added",
                     Toast.LENGTH_LONG).show();
         }
 
         bus.post(response);
+    }
+
+    @Subscribe
+    public void DeleteHistoryItem(HistoryListService.DeleteHistoryListRequest request){
+        Firebase ref = new Firebase(Utils.FIRE_BASE_HISTORY_LIST_REFERENCE +request.ownerEmail + "/" +request.historyItemId);
+        ref.removeValue();
     }
 }
 

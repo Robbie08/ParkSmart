@@ -89,6 +89,7 @@ public class BaseActivity extends AppCompatActivity {
                 (this instanceof SplashScreenActivity) || (this instanceof ForgotPasswordActivity))){
             auth.removeAuthStateListener(authStateListener);
         }
+
         finish();
     }
 }

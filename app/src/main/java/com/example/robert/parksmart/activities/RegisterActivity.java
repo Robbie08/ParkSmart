@@ -1,8 +1,10 @@
 package com.example.robert.parksmart.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.view.View;
@@ -86,6 +88,8 @@ public class RegisterActivity extends BaseActivity {
             //implying that there are errors since it did not return true
             userEmail.setError(response.getPropertyError("email")); //calls the error response from Account Services
             userName.setError(response.getPropertyError("userName"));//calls the error response from Account Services
+            Vibrator v  = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(50);
 
         }
     }

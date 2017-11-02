@@ -1,30 +1,24 @@
 package com.example.robert.parksmart.Fragments;
 
+import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.robert.parksmart.dialog.DeleteHistoryItemDialogFragment;
 import com.example.robert.parksmart.enteties.HistoryList;
 
 import com.example.robert.parksmart.infrastructure.Utils;
-import com.example.robert.parksmart.listServices.LocationCardView;
 import com.example.robert.parksmart.R;
 import com.example.robert.parksmart.views.HistoryListViews.HistoryListViewHolder;
 import com.firebase.client.Firebase;
 import com.firebase.ui.FirebaseRecyclerAdapter;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 
 import butterknife.ButterKnife;
 
@@ -32,14 +26,9 @@ public class Fragment_RecentLocations extends BaseFragment {
 
     View view;
     RecyclerView recyclerView;
-    //private RecyclerView.Adapter adapter;
     FirebaseRecyclerAdapter adapter;
     Context ctx;
     LinearLayoutManager manager;
-    public static ArrayList<LocationCardView> list = new ArrayList<>();
-    public static String date,time,locationName;
-    private DateFormat formatDay, formatTime;
-    Calendar calendar;
     String userEmail;
 
     public  Fragment_RecentLocations(){}
@@ -93,6 +82,22 @@ public class Fragment_RecentLocations extends BaseFragment {
                                 " was clicked", Toast.LENGTH_LONG).show();
                     }
                 });
+
+                historyListViewHolder.layout.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        if(userEmail.equals(Utils.encodeEmail(historyList.getOwnerEmail()))){
+                            DialogFragment dialogFragment = DeleteHistoryItemDialogFragment.newInstance(historyList.getId(),true);
+                            dialogFragment.show(getActivity().getFragmentManager(),DeleteHistoryItemDialogFragment.class.getSimpleName());
+                            return true;
+                        } else {
+                            Toast.makeText(getActivity().getApplicationContext(),"Only the owner can delete this item",Toast.LENGTH_LONG).show();
+                            return true;
+                        }
+                    }
+                });
+
+
             }
         };
 
@@ -109,11 +114,5 @@ public class Fragment_RecentLocations extends BaseFragment {
     public void onPause() {
         super.onPause();
         adapter.cleanup();
-    }
-
-    public void updateInfo(String nm){
-       locationName = nm;
-        Log.d("LOCATION_NAME","name: "+locationName);
-
     }
 }

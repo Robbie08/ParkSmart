@@ -26,4 +26,14 @@ public class HistoryListService {
 
     public static class HistoryListResponse extends ServiceResponse{
     }
+
+    public static class DeleteHistoryListRequest{
+        public String ownerEmail;
+        public String historyItemId;
+
+        public DeleteHistoryListRequest(String ownerEmail, String historyItemId) {
+            this.ownerEmail = ownerEmail;
+            this.historyItemId = historyItemId;
+        }
+    }
 }

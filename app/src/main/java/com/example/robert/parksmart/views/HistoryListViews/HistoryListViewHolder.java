@@ -14,10 +14,6 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by ortiz on 10/26/2017.
- */
-
 public class HistoryListViewHolder extends RecyclerView.ViewHolder {
 
     @BindView(R.id.list_history_list_itemName)

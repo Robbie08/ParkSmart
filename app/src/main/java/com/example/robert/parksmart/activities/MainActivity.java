@@ -38,7 +38,7 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 
-public class MainActivity extends BaseActivity implements Fragment_Map.onDataChanged, Fragment_Map.OnLocationSaveSetListener{
+public class MainActivity extends BaseActivity implements Fragment_Map.onDataChanged{
 
     private Toolbar toolBar;
     private DrawerLayout drawerLayout;
@@ -173,14 +173,15 @@ public class MainActivity extends BaseActivity implements Fragment_Map.onDataCha
                         try {
                             auth.signOut();
                             Toast.makeText(getApplicationContext(), "Successfully signed out!", Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(MainActivity.this, LoginActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(i);
+                            finish();
                         }catch (Exception e){
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "Did not log off correctly!", Toast.LENGTH_LONG).show();
 
                         }
-                        startActivity(new Intent(getApplicationContext(),LoginActivity.class));
-                        overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
-                        finish();
                         break;
 
                     default:
@@ -196,46 +197,6 @@ public class MainActivity extends BaseActivity implements Fragment_Map.onDataCha
 
     }
 
-    /**
-     * Method that weill log use out. Will call the singOut() from the FirebaseAuth
-     * Lib and then will perfrom a check to see if the user is still logged in our not.
-     * Using the getCurrentUser() from the FirebaseAuth Lib we will get the current user,
-     * if the method returns null then that means the user is successfully lgged off. In
-     * the given event that this method executes successfully the current Activity will
-     * close and then creating a new Instance the user will be sent to the LogIn Activity.
-     * <p>
-     * If the user could not be signed our successgfully then a Toast MSG will appear and
-     * let the user know that he was not able to be logged out successfully and dismiss the
-     * progress and return.
-     */
-    private void logUserOut() {
-
-        try {
-            firebaseAuth.signOut();
-            if (firebaseAuth.getCurrentUser() == null) {
-                finish();
-                Intent i = new Intent(MainActivity.this, LoginActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
-                finish();
-                progressDialog.dismiss();
-                Toast.makeText(getApplicationContext(), "Singed out Successfully",
-                        Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(getApplicationContext(), "Could not sign out, please try again",
-                        Toast.LENGTH_LONG).show();
-                progressDialog.dismiss();
-                return;
-            }
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Could not sign out, please try again",
-                    Toast.LENGTH_LONG).show();
-            progressDialog.dismiss();
-            return;
-
-        }
-
-    }
 
     /**
      * Method  will ask for permission to use the Phones Current GPS mLocation
@@ -340,8 +301,6 @@ public class MainActivity extends BaseActivity implements Fragment_Map.onDataCha
 
     }
 
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -355,19 +314,6 @@ public class MainActivity extends BaseActivity implements Fragment_Map.onDataCha
 
     }
 
-
-
-    /**
-     *   Will Transfer the data from Fragment_Map to Fragment_RecentLocations.
-     *   The data being transferred is a String an will contain the Name they gave
-     *   the location they will save
-     */
-    @Override
-    public void setLocationName(String locationName) {
-        Fragment_RecentLocations fragRecLoc = Fragment_RecentLocations.newInstance();
-        fragRecLoc.updateInfo(locationName);
-
-    }
 
     public interface SearchSchoolList{
         public void searchQuery(String val);

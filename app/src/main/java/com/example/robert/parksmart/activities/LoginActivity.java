@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.Log;
@@ -103,6 +104,8 @@ import com.squareup.otto.Subscribe;
             /* If there are any errors, prompt the user with the errors*/
             etEmail.setError(response.getPropertyError("email"));
             etPassword.setError(response.getPropertyError("password"));
+            Vibrator v  = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(50);
         }
     }
 

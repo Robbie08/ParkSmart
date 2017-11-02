@@ -1,8 +1,10 @@
 package com.example.robert.parksmart.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.widget.Button;
@@ -76,6 +78,8 @@ public class ForgotPasswordActivity extends BaseActivity {
     public void ResetUserPassword(AccountServices.ResetUserPasswordResponse response){
         if(!response.didSucceede()){
             userEmail.setError(response.getPropertyError("email"));
+            Vibrator v  = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(50);
         }
     }
 

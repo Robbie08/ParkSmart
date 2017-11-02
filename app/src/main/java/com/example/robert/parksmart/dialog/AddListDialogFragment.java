@@ -11,6 +11,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Gravity;
@@ -83,6 +84,8 @@ public class AddListDialogFragment extends BaseDialog implements View.OnClickLis
     public void AddItem(HistoryListService.HistoryListResponse response){
         if(!response.didSucceede()){
             newLocationName.setError(response.getPropertyError("listName"));
+            Vibrator v  = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(50);
         } else {
             dismiss();
         }

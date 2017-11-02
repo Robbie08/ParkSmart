@@ -6,6 +6,9 @@
     android:paddingBottom="16dp"
     android:paddingStart="16dp"
     android:paddingEnd="20dp"
+    android:background="@drawable/textlines"
+    android:layout_marginBottom=".05dp"
+    android:layout_marginTop=".05dp"
     android:id="@+id/list_history_list_layout"
     >
     <TextView
@@ -13,10 +16,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/list_history_list_itemName"
         android:textSize="16sp"
-        android:text="History Item Name"
+        android:text="Location Name"
         android:textColor="@color/colorAccent"
         android:layout_centerVertical="true"
-        android:textStyle="bold"
         android:layout_alignParentStart="true" />
 
     <TextView

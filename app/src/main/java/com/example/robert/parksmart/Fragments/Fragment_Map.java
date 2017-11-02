@@ -95,8 +95,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
     Fragment_RecentLocations recentLocations;
     private ArrayList<ParkingLotDetailsPOJO> parkingLotDetails;
 
-    OnLocationSaveSetListener onLocationSaveSetListener;
-
 
     @BindView(R.id.fab_save_location)
     FloatingActionButton floatingActionButton;
@@ -494,24 +492,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
         }
     }
 
-
-    /**
-     * Interface will send the location input to the MainActivity so that it can then
-     * be transferred to the Fragment_RecentLocations and then added to the RecyclerView
-     */
-    public interface OnLocationSaveSetListener{
-        public void setLocationName(String locationName);
-    }
-
-    @Override
-    public void onAttach(Activity activity){
-        super.onAttach(activity);
-        try {
-            onLocationSaveSetListener = (OnLocationSaveSetListener) activity;
-        }catch (Exception e){
-            Log.d("onAttach", "OnLocationSaveSetListener failed");
-        }
-    }
 }
 
 
