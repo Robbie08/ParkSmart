@@ -10,16 +10,31 @@
     android:layout_marginStart="16dp">
 
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@color/colorPrimaryDark"
+        android:id="@+id/linearLayout5">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|center_vertical"
+            android:src="@android:drawable/stat_sys_warning"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Attention!"
+        android:text="Oh man!"
         android:textSize="20sp"
         android:textColor="@color/colorPrimaryDark"
         android:id="@+id/textView2"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="27dp" />
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/linearLayout5"
+        android:layout_centerHorizontal="true" />
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -30,9 +45,9 @@
         android:textSize="16sp"
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginTop="16dp"
         android:layout_below="@+id/textView2"
-        android:layout_alignParentEnd="true" />
+        android:layout_marginBottom="40dp"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

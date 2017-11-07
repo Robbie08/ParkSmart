@@ -52,8 +52,8 @@ public class DeleteHistoryItemDialogFragment extends BaseDialog implements View.
         Button pButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
 
 
-        nButton.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-        pButton.setTextColor(getResources().getColor(R.color.colorAccent));
+        nButton.setTextColor(getResources().getColor(R.color.colorAccent));
+        pButton.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
 
         pButton.setOnClickListener(this);
         return dialog;
