@@ -4,12 +4,36 @@
     android:id="@+id/fragment_recent_location"
     >
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:background="@color/colorPrimaryDark"
+        android:id="@+id/relativeLayout2">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/park_smart_nav_header_croped"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Version 1.0.1"
+            android:textColor="@color/colorWhite"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="18dp" />
+
+    </RelativeLayout>
 
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/history_list_recycler_view"
-        />
+        android:layout_toEndOf="@+id/relativeLayout2"
+        android:layout_below="@+id/relativeLayout2"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

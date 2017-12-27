@@ -17,6 +17,7 @@
         android:id="@+id/list_history_list_itemName"
         android:textSize="16sp"
         android:text="Location Name"
+        android:textStyle="bold"
         android:textColor="@color/colorAccent"
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true" />

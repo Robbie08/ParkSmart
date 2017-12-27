@@ -1,5 +1,6 @@
 package com.example.robert.parksmart.services;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -77,6 +78,34 @@ public class AccountServices {
     }
     public static class ResetUserPasswordResponse extends ServiceResponse{
         //empty constructor for handling the Login by extending our ServiceResponse class
+    }
+
+
+    public static class UpdateUserNameRequest{
+        public String newName;
+        public String newNameRetry;
+
+        public UpdateUserNameRequest(String newName, String newNameRetry){
+            this.newName = newName;
+            this.newNameRetry = newNameRetry;
+        }
+    }
+
+    public static class UpdateUserNameResponse extends ServiceResponse {
+        //empty constructor that will handle the errors
+    }
+
+
+    public static class UpdatePasswordRequest{
+        public String userEmail;
+
+        public UpdatePasswordRequest(String userEmail) {
+            this.userEmail = userEmail;
+        }
+    }
+
+    public static class UpdatePasswordResponse extends ServiceResponse{
+        //empty constructor
     }
 
 }

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.robert.parksmart.activities.MainActivity;
 import com.example.robert.parksmart.dialog.DeleteHistoryItemDialogFragment;
 import com.example.robert.parksmart.enteties.HistoryList;
 
@@ -47,8 +48,9 @@ public class Fragment_RecentLocations extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_recent_location, container,false);
         ButterKnife.bind(this,view);
-        recyclerView = (RecyclerView) view.findViewById(R.id.history_list_recycler_view);
+        recyclerView = (RecyclerView) view.findViewById(R.id.history_list_recycler_view); //recycler view reference
 
+        ((MainActivity) getActivity()).setActionBarTitle("History");
         return view;
 
 
@@ -63,9 +65,9 @@ public class Fragment_RecentLocations extends BaseFragment {
         userEmail = getActivity().getSharedPreferences(Utils.MY_PREFERENCE, Context.MODE_PRIVATE).getString(Utils.EMAIL,"");
 
 
+        Firebase historyListRef = new Firebase(Utils.FIRE_BASE_HISTORY_LIST_REFERENCE +userEmail); //initialize firebase reference
 
-        Firebase historyListRef = new Firebase(Utils.FIRE_BASE_HISTORY_LIST_REFERENCE +userEmail);
-
+        //initialize FirebaseRecyclerViewAdapter
         adapter = new FirebaseRecyclerAdapter<HistoryList, HistoryListViewHolder>(HistoryList.class,
                 R.layout.list_history_list,
                 HistoryListViewHolder.class,
@@ -73,11 +75,12 @@ public class Fragment_RecentLocations extends BaseFragment {
 
             @Override
             protected void populateViewHolder(HistoryListViewHolder historyListViewHolder, final HistoryList historyList, int i) {
-                historyListViewHolder.populate(historyList);
-                historyListViewHolder.setIsRecyclable(true);
+                historyListViewHolder.populate(historyList); //view holder
+                historyListViewHolder.setIsRecyclable(true); //make the recycler work
                 historyListViewHolder.layout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        //when the Item of the list is clicked
                         Toast.makeText(getContext().getApplicationContext(), historyList.getListName() +
                                 " was clicked", Toast.LENGTH_LONG).show();
                     }
@@ -86,7 +89,9 @@ public class Fragment_RecentLocations extends BaseFragment {
                 historyListViewHolder.layout.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
+                        //when the item of the list is long held
                         if(userEmail.equals(Utils.encodeEmail(historyList.getOwnerEmail()))){
+                            //test case to make sure the user is the only on to delete item
                             DialogFragment dialogFragment = DeleteHistoryItemDialogFragment.newInstance(historyList.getId(),true);
                             dialogFragment.show(getActivity().getFragmentManager(),DeleteHistoryItemDialogFragment.class.getSimpleName());
                             return true;
@@ -102,10 +107,10 @@ public class Fragment_RecentLocations extends BaseFragment {
         };
 
 
-        manager.setReverseLayout(true);
-        manager.setStackFromEnd(true);
-        recyclerView.setLayoutManager(manager);
-        recyclerView.setAdapter(adapter);
+        manager.setReverseLayout(true); //Allow the recycler view to place most recent item to the top
+        manager.setStackFromEnd(true); //will set our current stack to begin at the end
+        recyclerView.setLayoutManager(manager); //pass in our rules for the recycler view
+        recyclerView.setAdapter(adapter); //connect the Adapter with the RecyclerView
 
     }
 

@@ -16,24 +16,22 @@ import butterknife.ButterKnife;
 
 public class HistoryListViewHolder extends RecyclerView.ViewHolder {
 
-    @BindView(R.id.list_history_list_itemName)
-    TextView itemName;
+    @BindView(R.id.list_history_list_itemName) TextView itemName; //holds our itemName
 
-    @BindView(R.id.list_history_list_dateCreated)
-    TextView dateCreated;
+    @BindView(R.id.list_history_list_dateCreated) TextView dateCreated; //Holds the date created
 
-    @BindView(R.id.list_history_list_layout)
-    public View layout;
+    @BindView(R.id.list_history_list_layout) public View layout; //is the layout
 
     public HistoryListViewHolder(View itemView) {
         super(itemView);
-        ButterKnife.bind(this,itemView);
+        ButterKnife.bind(this,itemView); //bind our butterknife
     }
 
     public void populate(HistoryList historyList){
-        itemName.setText(historyList.getListName());
+        itemName.setText(historyList.getListName()); //set our text to be list name
 
         if(historyList.getDateCreated().get("timestamp") != null) {
+            //only if the timestamp is null
             Log.d("History_List", " list is not null");
             dateCreated.setText(convertTime((long) historyList.getDateCreated().get("timestamp")));
         }
@@ -44,8 +42,8 @@ public class HistoryListViewHolder extends RecyclerView.ViewHolder {
 
     private String convertTime (Long unixTime){
         Date dateObject = new Date(unixTime);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yy kk:mm");
-        return simpleDateFormat.format(dateObject);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yy kk:mm"); //set our format for out Unixtime
+        return simpleDateFormat.format(dateObject); // change from UnixTime to human time
     }
 }
 

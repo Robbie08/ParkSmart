@@ -1,5 +1,6 @@
 package com.example.robert.parksmart.live;
 
+import android.support.design.widget.Snackbar;
 import android.widget.Toast;
 
 
@@ -34,14 +35,7 @@ public class LiveHistoryListServices extends BaseLiveService {
             timeStampCreated.put("timestamp",ServerValue.TIMESTAMP);
             HistoryList historyList = new HistoryList(reference.getKey(),request.listName,Utils.decodeEmail(request.ownerEmail),
                     request.ownerName,timeStampCreated);
-            reference.child("id").setValue(historyList.getId());
-            reference.child("listName").setValue(historyList.getListName());
-            reference.child("ownerEmail").setValue(historyList.getOwnerEmail());
-            reference.child("ownerName").setValue(historyList.getOwnerName());
-            reference.child("dateCreated").setValue(historyList.getDateCreated());
-            reference.child("dateLastChanged").setValue(historyList.getDateLastChanged());
-
-
+            reference.setValue(historyList); //set all values the database
             Toast.makeText(application.getApplicationContext()," Location has been added",
                     Toast.LENGTH_LONG).show();
         }

@@ -10,8 +10,8 @@ public class MapServices {
 
     public static class UserLocationRequest {
         String location; //Location Lat&Lng
-        String ownerName;
-        String ownerEmail;
+        String ownerName; //owner Name
+        String ownerEmail; // owner Email
 
         public UserLocationRequest(String location, String ownerName, String ownerEmail) {
             this.location = location;

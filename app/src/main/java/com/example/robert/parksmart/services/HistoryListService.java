@@ -1,5 +1,8 @@
 package com.example.robert.parksmart.services;
 
+import android.support.design.widget.CoordinatorLayout;
+import android.view.View;
+
 import com.example.robert.parksmart.infrastructure.ServiceResponse;
 
 /**

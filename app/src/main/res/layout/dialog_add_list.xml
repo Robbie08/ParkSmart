@@ -16,7 +16,7 @@
         <ImageView
             android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_save_white_24dp"
+            android:src="@drawable/add_location"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
 
@@ -44,6 +44,7 @@
         <EditText
             android:id="@+id/dialog_add_list_editText"
             android:layout_width="match_parent"
+            android:maxLength="30"
             android:layout_height="40dp"
             android:layout_marginBottom="16dp"
             android:layout_marginLeft="16dp"

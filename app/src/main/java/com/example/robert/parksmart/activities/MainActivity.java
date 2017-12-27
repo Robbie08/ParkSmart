@@ -29,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.robert.parksmart.Fragments.Fragment_Settings;
 import com.example.robert.parksmart.R;
 import com.example.robert.parksmart.Fragments.Fragment_Map;
 import com.example.robert.parksmart.Fragments.Fragment_RecentLocations;
@@ -54,6 +55,7 @@ public class MainActivity extends BaseActivity implements Fragment_Map.onDataCha
     private FirebaseAuth firebaseAuth;
     private ProgressDialog progressDialog;
     private Fragment_SchoolsList fragSchoolList;
+    private Fragment_Settings fmSettings;
     private String mText;
     private String schoolNameString;
 
@@ -157,6 +159,7 @@ public class MainActivity extends BaseActivity implements Fragment_Map.onDataCha
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, fragment_map).commit();// pass in our fragment
 
+
                         break;
                     case R.id.recent_id:
                         fmRecentLocations = Fragment_RecentLocations.newInstance();
@@ -164,7 +167,18 @@ public class MainActivity extends BaseActivity implements Fragment_Map.onDataCha
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, fmRecentLocations).commit();
 
+
                         break;
+
+                    case R.id.settings_id:
+                        fmSettings = Fragment_Settings.newInstance();
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fragment_container,fmSettings).commit();
+
+
+                        break;
+
                     case R.id.signout_id:
                         SharedPreferences sharedPreferences2 = getSharedPreferences(Utils.MY_PREFERENCE, Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences2.edit();
@@ -299,6 +313,10 @@ public class MainActivity extends BaseActivity implements Fragment_Map.onDataCha
 
         return true;
 
+    }
+
+    public void setActionBarTitle(String title){
+        getSupportActionBar().setTitle(title);
     }
 
     @Override

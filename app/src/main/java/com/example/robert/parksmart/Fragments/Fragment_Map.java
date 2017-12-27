@@ -1,18 +1,19 @@
 package com.example.robert.parksmart.Fragments;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,28 +24,30 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.robert.parksmart.activities.MainActivity;
 import com.example.robert.parksmart.dialog.AddListDialogFragment;
-import com.example.robert.parksmart.infrastructure.Utils;
 import com.example.robert.parksmart.listServices.AdapterSchoolNameCardView;
 import com.example.robert.parksmart.enteties.ParkingLotDetailsPOJO;
 import com.example.robert.parksmart.R;
-import com.example.robert.parksmart.services.HistoryListService;
+import com.example.robert.parksmart.services.GPSTracker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -53,10 +56,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.otto.Bus;
 
 import java.io.IOException;
-import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,61 +65,48 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class Fragment_Map extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, AdapterSchoolNameCardView.OnLocationSelected{
+public class Fragment_Map extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, AdapterSchoolNameCardView.OnLocationSelected, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener{
 
     private GoogleMap mMap;
     private SupportMapFragment mSupportMapFragment;
     private onDataChanged onDataChanged; //create an instance of the Interface
-    private View view, mView ,layout; // view object that will be returned in the onCreateView
-//    private ImageButton bSearchLocation;
-    //private EditText etSearchLocation;
+    private View view, mView ; // view object that will be returned in the onCreateView
+
     private CameraUpdate camUpdate;
     private ProgressDialog progressDialog, progSaveLoc;
 
-    float zoomLevel = (float) 12.0; //The zoom of the map
-    float parkingZoomLevel = (float) 18.0; //The zoom of the map
-    float schoolZoomLevel = (float) 14.5;
-    float green = BitmapDescriptorFactory.HUE_GREEN;
+
+    private float USER_LOCATION_ZOOM = (float) 15.5; //The zoom of the map
+    private float schoolZoomLevel = (float) 14.5;
+    private float green = BitmapDescriptorFactory.HUE_GREEN;
 
     private Criteria criteria;
     private FirebaseDatabase database;
     private DatabaseReference ref;
-    private String ParsedLocation;
     private FloatingActionButton fab_plus;
     private AlertDialog alertDialog;
     private LocationManager locationManager;
-    private String provider,parsedNameLocation, parsedLocation, schoolName;
-
-    private EditText etLocationName;
-    private Button bAddLocation;
-    private double latitude,longitude;
-    Fragment_RecentLocations recentLocations;
+    private String provider, parsedLocation;
+    private Location mLocation;
+    private LatLng USER_LOCATION;
+    private Fragment_RecentLocations recentLocations;
     private ArrayList<ParkingLotDetailsPOJO> parkingLotDetails;
-
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    public double longitude;
+    public double latitude;
+    private String TAG = "API CHECK";
 
     @BindView(R.id.fab_save_location)
     FloatingActionButton floatingActionButton;
 
-    @BindView(R.id.bSearchLocation)
-    ImageButton bSearchLocation;
 
-    @BindView(R.id.etSearchLocation)
-    EditText etSearchLocation;
 
-    //Set parameters to whatever data we would like to pass to that fragment.
-
-    /*
-
-       The purpose of this approach is to ensure data is kept in the fragment.
-       Useful especially when the Android OS decides to recreate the fragment.
-
-     */
 
     public static Fragment_Map newInstance(){
 
         Fragment_Map fragment_map = new Fragment_Map();
         Bundle args = new Bundle();
-       // args.putSerializable();
         fragment_map.setArguments(args);
         return fragment_map;
     }
@@ -146,18 +134,29 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
         criteria.setBearingRequired(true);
         criteria.setCostAllowed(true);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        provider = locationManager.getBestProvider(criteria,true);
 
-        /*Declare Views in AlertDialog*/
-        //etLocationName  = (EditText) mView.findViewById(R.id.dialog_add_list_editText); // location name
-        //bAddLocation = (Button) mView.findViewById(R.id.bSaveLocation); //button for dialog box
+
 
         recentLocations = Fragment_RecentLocations.newInstance();
-
         mSupportMapFragment = SupportMapFragment.newInstance();
         FragmentManager fm = getFragmentManager();
         mSupportMapFragment.getMapAsync(this);
+
+
+        //set up ApiClient
+        mGoogleApiClient = new GoogleApiClient.Builder(getContext())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
+        //set up LocationManager
+        locationManager = (LocationManager) getActivity().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        provider = locationManager.getBestProvider(criteria,true);
+
+
+
+        ((MainActivity) getActivity()).setActionBarTitle("ParkSmart");
         if (!mSupportMapFragment.isAdded())
             fm.beginTransaction().add(R.id.map, mSupportMapFragment).commit();
 
@@ -165,7 +164,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
             fm.beginTransaction().hide(mSupportMapFragment).commit();
         else
             fm.beginTransaction().show(mSupportMapFragment).commit();
-
 
         return view;
     }
@@ -177,28 +175,26 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
         dialogFragment.show(getActivity().getFragmentManager(), AddListDialogFragment.class.getSimpleName());
 
     }
-
-    @OnClick(R.id.bSearchLocation)
-    public void setbSearchLocation(){
-
-        //Toast.makeText(getContext(),"Search bar Working Properly",Toast.LENGTH_LONG).show();
-        if (!(TextUtils.isEmpty(etSearchLocation.getText().toString().trim()))) {
-            try {
-                parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
-                //queryParkingData(parsedLocation);
-                etSearchLocation.setText("");
-                goToPlace(parsedLocation, schoolZoomLevel);
-            }catch (Exception e){
-                e.printStackTrace();
-                Toast.makeText(getActivity(),"Please input a school", Toast.LENGTH_LONG).show();
-            }
-        }
-        if(TextUtils.isEmpty(etSearchLocation.getText().toString().trim())){
-            Toast.makeText(getActivity(),"Please input a school",Toast.LENGTH_LONG).show();
-        }
-
-    }
-
+//
+//    @OnClick(R.id.bSearchLocation)
+//    public void setbSearchLocation(){
+//
+//        if (!(TextUtils.isEmpty(etSearchLocation.getText().toString().trim()))) {
+//            try {
+//                parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
+//                //queryParkingData(parsedLocation);
+//                etSearchLocation.setText("");
+//                goToPlace(parsedLocation, schoolZoomLevel);
+//            }catch (Exception e){
+//                e.printStackTrace();
+//                Toast.makeText(getActivity(),"Please input a school", Toast.LENGTH_LONG).show();
+//            }
+//        }
+//        if(TextUtils.isEmpty(etSearchLocation.getText().toString().trim())){
+//            Toast.makeText(getActivity(),"Please input a school",Toast.LENGTH_LONG).show();
+//        }
+//
+//    }
 
     /**
      * Manipulates the map once available.
@@ -212,116 +208,102 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap; //create an instance of our googleMap class
 
-        // Add a marker in San Diego and move the camera
-        LatLng sanDiego = new LatLng(32.7157, -117.1611); //arguments Lat and Long
-
-
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL); //sets the maps view
-        mMap.addMarker(new MarkerOptions().position(sanDiego).title("Park Smart Headquarters")); //pass in the LatLng object
-        camUpdate = CameraUpdateFactory.newLatLngZoom(sanDiego, zoomLevel); //move the camera to where the object is pointing
-        mMap.animateCamera(camUpdate);
-        if ( (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
 
-           // mMap.setMyLocationEnabled(true);
-        }else {
-            Toast.makeText(getContext(),"Please Enable Location On Your Device To Use Google Maps",
-                    Toast.LENGTH_LONG).show();
+
+
+
+
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
         }
 
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+
+//        if ( (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+//                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+//
+//            //if we have permission
+//            try {
+//
+//                //Location location = locationManager.getLastKnownLocation(provider);//create a location and take in the provider
+//                USER_LOCATION = new LatLng(latitude, longitude); //create our Lat&Long object
+//                Log.d("Latitude", Double.toString(mLocation.getLatitude()));
+//                Log.d("longitude",Double.toString(mLocation.getLongitude()));
+//
+//            }
+//            catch (NullPointerException e){
+//
+//                USER_LOCATION = new LatLng(35.6895,139.6917); //se the location to be in Tokyo
+//                USER_LOCATION_ZOOM = (float) 14.5;
+//                Snackbar snackbar = Snackbar.make(view, "Please enable GPS location on your device ",Snackbar.LENGTH_LONG);
+//                snackbar.show();
+//            }
+//
+//        }else {
+//            Snackbar snackbar = Snackbar.make(view, "Please enable GPS location on your",Snackbar.LENGTH_LONG);
+//            snackbar.show();
+//        }
+
+        if(Double.toString(latitude).isEmpty() || Double.toString(longitude).isEmpty() || (mLocation == null)) {
+
+            //if the LatLng object is null
+            USER_LOCATION = new LatLng(35.6895, 139.6917); //se the location to be in Tokyo
+            USER_LOCATION_ZOOM = (float) 14.5;
+        }
+
+
+        //add the circle to the users current location
+        mMap.addCircle(new CircleOptions()
+                .center(USER_LOCATION).radius(350)
+                .strokeColor(Color.GRAY)
+                .fillColor(0x30ff0000)
+                .strokeWidth(1).fillColor(0x30ff0000));
+
+        //add a smaller circle to the current location
+        mMap.addCircle(new CircleOptions()
+                .center(USER_LOCATION).radius(80)
+                .strokeColor(Color.BLACK)
+                .fillColor(0x30ff0000)
+                .strokeWidth(1).fillColor(0x30ff0000));
+
+
+
+        camUpdate = CameraUpdateFactory.newLatLngZoom(USER_LOCATION, USER_LOCATION_ZOOM); //move the camera to where the object is pointing
+        mMap.animateCamera(camUpdate);
         mMap.setOnInfoWindowClickListener(this);
 
     }
 
-//    The old version of DialogFragment is hidden here
-//    /**
-//     * When the user clicks the search button
-//     *
-//     * @param view pass in the fragment
-//     */
-//    @Override
-//    public void onClick(View view) {
-//
-//        switch (view.getId()){
-//            case R.id.fab_save_location:
-//                // handle the action of the Floating Action Button
-//                try{
-//                    /*Manifest alertDialog*/
-//                    alertDialog.setView(mView);
-//                    alertDialog.show();
-//                    bAddLocation.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View view) {
-//                            //AlertDialog button is clicked
-//                            try{
-//                                parsedNameLocation = etLocationName.getText().toString().trim(); //getLocation
-//
-//                                if (!(TextUtils.isEmpty(parsedNameLocation))) {
-//                                    onLocationSaveSetListener.setLocationName(parsedNameLocation);
-//
-//                                    /*Check if the user has given permission */
-//                                    if ((ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-//                                            ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
-//
-//                                        //if we have permission
-//                                        try {
-//                                            Location location = locationManager.getLastKnownLocation(provider);//create a location and take in the provider
-//                                            latitude = location.getLatitude(); //get an set our latitude
-//                                            longitude = location.getLongitude(); //get an set our longitude
-//                                        }catch (NullPointerException e){
-//                                            Toast.makeText(getContext(),"NullPointerException Caught... You're Welcome",Toast.LENGTH_LONG).show();
-//                                        }
-//                                    }
-//                                    Log.d("Latitude", Double.toString(latitude));
-//                                    Log.d("Longitude", Double.toString(longitude));
-//
-//                                }else{
-//                                    Toast.makeText(getContext(), "Please give your location a name", Toast.LENGTH_LONG).show();
-//                                    return;
-//                                }
-//
-//                            }catch (Exception e){
-//                                Log.d("ALERT DIALOG BUTTON", "The click event failed");
-//                                e.printStackTrace();
-//                                return;
-//                            }
-//
-//
-//                            /*Show our progress Dialog*/
-//                            progSaveLoc.show();
-//                            new BackGroundTask().execute(); //execute our background tasks
-//
-//                        }
-//                    });
-//                }catch (NullPointerException e){
-//                    Log.d("FLOATING ACTION BUTTON", "The click event failed");
-//                    e.printStackTrace();
-//                    return;
-//                }
-//
-//                break;
-//
-//
-//            case R.id.bSearchLocation:
-//                if(!etSearchLocation.getText().toString().trim().equals("")) {
-//                    parsedLocation = etSearchLocation.getText().toString().trim(); //parse the value in the EditText
-//                    //queryParkingData(parsedLocation);
-//                    etSearchLocation.setText("");
-//                    goToPlace(parsedLocation,schoolZoomLevel);
-//
-//                }else{
-//                    progressDialog.dismiss();
-//                    Toast.makeText(getActivity(),"Please input a school",Toast.LENGTH_LONG).show();
-//                }
-//                break;
-//
-//            default:
-//                break;
-//
-//        }
-//
-//
-//    }
+    protected void startLocationUpdates(){
+        // Create the location request
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        // Request location updates
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
+                mLocationRequest, this);
+        Log.d("reque", "--->>>>");
+    }
 
 
     public void queryParkingData(String locationPassed) {
@@ -352,7 +334,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
                         Log.d("Fragment_Map","children: " + messageSnapshot.getValue().toString());
                     }
                     updateUI();
-
                 }
 
                 @Override
@@ -452,10 +433,80 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
     }
 
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+
+
+
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(mGoogleApiClient.isConnected()){
+            mGoogleApiClient.disconnect();
+        }
+    }
+
     @Override
     public void sendData(String location) {
         Log.d("LocationCaught", " value: "+location);
         queryParkingData(location);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        //help connect the user
+
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+
+        mLocation = locationManager.getLastKnownLocation(locationManager
+                .getBestProvider(criteria, false));
+
+
+        if(mLocation == null){
+            startLocationUpdates();
+        }
+        if (mLocation != null) {
+            latitude = mLocation.getLatitude();
+            longitude = mLocation.getLongitude();
+            USER_LOCATION = new LatLng(latitude, longitude); //create our Lat&Long object
+
+        } else {
+            Toast.makeText(getContext(), "Location not Detected", Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i(TAG," Connection Suspended");
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.i(TAG, "Connection Failed. Error: " +connectionResult.getErrorCode());
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
     }
 
 
@@ -480,16 +531,6 @@ public class Fragment_Map extends Fragment implements OnMapReadyCallback, Google
             return null;
         }
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            progSaveLoc.dismiss();
-            alertDialog.dismiss();
-            etLocationName.setText("");
-            Toast.makeText(getContext(),"Your Location has now been saved!",Toast.LENGTH_LONG).show();
-            getActivity().getSupportFragmentManager().
-                    beginTransaction().
-                    replace(R.id.fragment_container, recentLocations).commit();
-        }
     }
 
 }

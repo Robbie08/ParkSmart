@@ -8,11 +8,8 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextClock;
 import android.widget.TextView;
 
 import butterknife.BindView;
@@ -22,7 +19,6 @@ import butterknife.OnClick;
 import com.example.robert.parksmart.R;
 import com.example.robert.parksmart.infrastructure.Utils;
 import com.example.robert.parksmart.services.AccountServices;
-import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.otto.Subscribe;
 
 
@@ -67,7 +63,7 @@ import com.squareup.otto.Subscribe;
         mProgressDialog.setCancelable(false); //user cant dismiss this
         sharedPreferences = getSharedPreferences(Utils.MY_PREFERENCE, Context.MODE_PRIVATE);
 
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.activity_login_coordingator_layout);
 
 
     }
