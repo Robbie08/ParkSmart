@@ -25,10 +25,10 @@ public class ChangeUserName extends BaseDialog implements View.OnClickListener {
 
 
     @BindView(R.id.dialog_change_user_name_editText)
-    EditText newName;
+    EditText newName; //Edit text that will contain our new name
 
     @BindView(R.id.dialog_change_user_name_retry_edit_text)
-    EditText newNameRetry;
+    EditText newNameRetry; //EditText that will contain re-entry of our new name
 
 
     public static ChangeUserName newInstance() {
@@ -53,14 +53,14 @@ public class ChangeUserName extends BaseDialog implements View.OnClickListener {
                 .show();
 
         Button nButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE); //negative button to cancel
-        Button pButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE); //positive button to Add location
+        Button pButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE); //positive button to change the name
 
 
         //Set the color of our buttons
-        nButton.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-        pButton.setTextColor(getResources().getColor(R.color.colorAccent));
+        nButton.setTextColor(getResources().getColor(R.color.colorPrimaryDark));//set color of our button to red
+        pButton.setTextColor(getResources().getColor(R.color.colorAccent)); //set our color of our button to green
 
-        pButton.setOnClickListener(this);
+        pButton.setOnClickListener(this);//ready to listen for the click
 
 
         return alertDialog;
@@ -77,13 +77,18 @@ public class ChangeUserName extends BaseDialog implements View.OnClickListener {
     @Subscribe
     public void updateUserName(AccountServices.UpdateUserNameResponse response){
         if(!response.didSucceede()){
+
+            //set our errors if response was not successful
             newName.setError(response.getPropertyError("newName"));
             newNameRetry.setError(response.getPropertyError("newNameRetry"));
             newNameRetry.setError(response.getPropertyError("names"));
             newName.setError(response.getPropertyError("names"));
+            newName.setError(response.getPropertyError("fields"));
+            newNameRetry.setError(response.getPropertyError("fields"));
             Vibrator v  = (Vibrator) application.getSystemService(Context.VIBRATOR_SERVICE);
             v.vibrate(50);
         }else {
+            //dismiss our dialog
             dismiss();
         }
 

@@ -52,9 +52,6 @@ public class Fragment_Settings extends BaseFragment {
     @BindView(R.id.fragment_settings_user_name)
     TextView text_view_user_name;
 
-    @BindView(R.id.fragment_settings_edit_email)
-    ImageView editEmail;
-
     @BindView(R.id.fragment_settings_edit_password)
     ImageView editPassword;
 
@@ -122,8 +119,8 @@ public class Fragment_Settings extends BaseFragment {
 
     public void updateUI(){
         //Grab data from reference and declare values
-        userEmail = getActivity().getSharedPreferences(Utils.MY_PREFERENCE, Context.MODE_PRIVATE).getString(Utils.EMAIL,"");
-        userName = getActivity().getSharedPreferences(Utils.MY_PREFERENCE,Context.MODE_PRIVATE).getString(Utils.USERNAME,"");
+        userEmail = getActivity().getSharedPreferences(Utils.MY_PREFERENCE, Context.MODE_PRIVATE).getString(Utils.EMAIL,""); // will grab our current  registered
+        userName = getActivity().getSharedPreferences(Utils.MY_PREFERENCE,Context.MODE_PRIVATE).getString(Utils.USERNAME,""); // will grab our current name registered
         decodedEmail  = Utils.decodeEmail(userEmail); //format email
         try{
             //set our editText to whatever is retrieved from Firebase
@@ -152,11 +149,6 @@ public class Fragment_Settings extends BaseFragment {
         dialogFragment.show(getActivity().getFragmentManager(),ChangePassword.class.getSimpleName());
     }
 
-    //set up onClick listener to edit Email
-    @OnClick(R.id.fragment_settings_edit_email)
-    public void setEditEmail(){
-        Toast.makeText(getContext(),"Edit Email Worked",Toast.LENGTH_LONG).show();
-    }
 
 
 

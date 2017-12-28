@@ -159,14 +159,7 @@
                 android:layout_alignBottom="@+id/fragment_settings_user_email"
                 android:layout_toStartOf="@+id/fragment_settings_user_email"
                 android:id="@+id/imageView8" />
-            <ImageView
-                android:id="@+id/fragment_settings_edit_email"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/edit"
-                android:layout_alignTop="@+id/imageView8"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="22dp" />
+
 
         </RelativeLayout>
 

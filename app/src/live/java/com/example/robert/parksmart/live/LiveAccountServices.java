@@ -273,6 +273,10 @@ public class LiveAccountServices extends BaseLiveService {
             response.setPropertyErrors("names" , "Please make sure the two entries match");
         }
 
+        if((request.newName.isEmpty()) && (request.newNameRetry.isEmpty())){
+            response.setPropertyErrors("fields","Please make sure to fill out both fields");
+        }
+
         if(response.didSucceede()){
 
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -280,7 +284,6 @@ public class LiveAccountServices extends BaseLiveService {
 
             if(user != null){
                 //user is signed in
-                String name = user.getDisplayName();
                 String email = user.getEmail();
                 String formatedEmail = Utils.encodeEmail(email);
                 assert email != null;
